@@ -1,0 +1,43 @@
+---
+title: 'first post: classic iris'
+author: Isaiah Valencia
+date: '2020-08-29'
+slug: first-post-classic-iris.en-us
+categories:
+  - Misc
+tags:
+  - visualization
+  - EDA
+keywords:
+  - tech
+---
+
+<!--more-->
+
+```{r, echo=FALSE,results='hide',message=FALSE}
+suppressWarnings(library(tidyverse))
+
+```
+
+
+Here is an average of the petal and sepal length of the iris flower species
+```{r,echo=FALSE}
+t = as.data.frame(iris) %>% group_by(Species) %>% summarize(avg_sepal_length = mean(Sepal.Length), avg_sepal_width = mean(Sepal.Width)) 
+
+knitr::kable(t, caption = 'Averages of flower attributes')
+```
+
+
+The following is a local regression line where the petal length is regressed on petal width 
+```{r, echo = FALSE}
+loc = loess(Petal.Length~ Petal.Width,data=iris)
+
+p <- ggplot(iris,mapping = aes(x = Petal.Width, y = Petal.Length)) 
+
+p + geom_point(mapping = aes(colour = factor(Species))) + 
+  geom_smooth(method = 'loess') + ggtitle("Local Regression with variance")
+  
+```
+
+
+
