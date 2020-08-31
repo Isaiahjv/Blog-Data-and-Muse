@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>EDA on Data &amp; Muse</title>
-    <link>/dataandmuse.com/tags/eda/</link>
+    <link>/tags/eda/</link>
     <description>Recent content in EDA on Data &amp; Muse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 29 Aug 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/dataandmuse.com/tags/eda/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/eda/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>First Post: Classic Iris</title>
-      <link>/dataandmuse.com/2020/08/first-post-classic-iris.en-us/</link>
+      <link>/2020/08/first-post-classic-iris.en-us/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/dataandmuse.com/2020/08/first-post-classic-iris.en-us/</guid>
+      <guid>/2020/08/first-post-classic-iris.en-us/</guid>
       <description>
 
 
