@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Data &amp; Muse</title>
-    <link>/www.dataandmuse.com/categories/</link>
+    <link>/dataandmuse.com/categories/</link>
     <description>Recent content in Categories on Data &amp; Muse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 30 Aug 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/www.dataandmuse.com/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/dataandmuse.com/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Basketball</title>
-      <link>/www.dataandmuse.com/categories/basketball/</link>
+      <link>/dataandmuse.com/categories/basketball/</link>
       <pubDate>Sun, 30 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/categories/basketball/</guid>
+      <guid>/dataandmuse.com/categories/basketball/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Sports</title>
-      <link>/www.dataandmuse.com/categories/sports/</link>
+      <link>/dataandmuse.com/categories/sports/</link>
       <pubDate>Sun, 30 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/categories/sports/</guid>
+      <guid>/dataandmuse.com/categories/sports/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Misc</title>
-      <link>/www.dataandmuse.com/categories/misc/</link>
+      <link>/dataandmuse.com/categories/misc/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/categories/misc/</guid>
+      <guid>/dataandmuse.com/categories/misc/</guid>
       <description></description>
     </item>
     

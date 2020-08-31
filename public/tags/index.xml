@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Data &amp; Muse</title>
-    <link>/www.dataandmuse.com/tags/</link>
+    <link>/dataandmuse.com/tags/</link>
     <description>Recent content in Tags on Data &amp; Muse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 30 Aug 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/www.dataandmuse.com/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/dataandmuse.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>classification</title>
-      <link>/www.dataandmuse.com/tags/classification/</link>
+      <link>/dataandmuse.com/tags/classification/</link>
       <pubDate>Sun, 30 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/tags/classification/</guid>
+      <guid>/dataandmuse.com/tags/classification/</guid>
       <description></description>
     </item>
     
     <item>
       <title>EDA</title>
-      <link>/www.dataandmuse.com/tags/eda/</link>
+      <link>/dataandmuse.com/tags/eda/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/tags/eda/</guid>
+      <guid>/dataandmuse.com/tags/eda/</guid>
       <description></description>
     </item>
     
     <item>
       <title>visualization</title>
-      <link>/www.dataandmuse.com/tags/visualization/</link>
+      <link>/dataandmuse.com/tags/visualization/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>/www.dataandmuse.com/tags/visualization/</guid>
+      <guid>/dataandmuse.com/tags/visualization/</guid>
       <description></description>
     </item>
     
