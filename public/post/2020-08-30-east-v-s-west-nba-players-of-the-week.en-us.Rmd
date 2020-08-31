@@ -13,3 +13,57 @@ keywords:
 ---
 
 <!--more-->
+
+```{r}
+data <-read.csv("~/Desktop/Isaiah's Blog/blog/opening/datasets/datasets-44726-1009991-NBA_player_of_the_week.csv.xls")
+```
+
+```{r, echo=F,results='hide',message=FALSE}
+library(tidyverse)
+```
+
+
+```{r}
+data %>% head()
+
+eastern <-  c("Atlanta Hawks", "Boston Celtics","Charlotte Hornets" ,"Chicago Bulls","Cleveland Cavaliers", "Detroit Pistons", "Indiana Pacers","Miami Heat","Milwaukee Bucks","Brooklyn Nets","New York Knicks","Orlando Magic","Philadelphia Sixers","Toronto Raptors","Washington Wizards")
+
+western <- c("Dallas Mavericks","Denver Nuggets","Golden State Warriors","Houston Rockets","Los Angeles Clippers","Los Angeles Lakers","Memphis Grizzlies","Minnesota Timberwolves","New Orleans Pelicans","Oklahoma City Thunder","Phoenix Suns","Portland Trail Blazers","Sacramento Kings","San Antonio Spurs","Utah Jazz")
+
+data <- data %>% mutate(Conference = case_when(Team %in% eastern ~ "East", TRUE ~ "West" ), Conference = as.factor(Conference))
+```
+
+```{r, echo = F,results='hide',message=FALSE}
+# ===========================================
+# ------------- East versus West by position ------------------
+
+agg_evsw <- function(d){
+  d <- d %>% group_by(Conference) %>% summarize(n = n()) %>% 
+  mutate(percent = n/sum(n)) %>% 
+  ungroup() 
+  d
+  
+  d %>% ggplot(mapping = aes(x = Conference, y = percent)) + geom_col(mapping = aes(fill = Conference)) + ggtitle("Percent East v.s. West")
+  
+
+}
+agg_evsw(data)
+# ===========================================
+# ------------- East versus West by position ------------------
+
+evsw_bypos <- function(d){
+  d <- d %>% group_by(Conference,Position) %>% summarize(n = n()) %>% 
+  mutate(percent = n/sum(n)) %>% 
+  ungroup() 
+  
+  print(d)
+  
+  d %>% ggplot(mapping = aes(x = Position, y = percent)) + geom_col(mapping = aes(fill = Conference), position = "dodge2") + ggtitle("Percent East v.s. West")
+  
+  
+}
+evsw_bypos(data)
+
+
+```
+
