@@ -12,6 +12,8 @@ tags:
   - ggplot
 keywords:
   - tech
+thumbnailImage: images/lacrime.JPG
+thumbnailImagePosition: left
 ---
 
 <!--more-->
