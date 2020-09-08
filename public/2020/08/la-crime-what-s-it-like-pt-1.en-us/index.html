@@ -19,10 +19,10 @@
 
 ">
 <meta property="og:type" content="article">
-<meta property="og:title" content="East v.s. West: NBA &#34;Players of the Week&#34;">
-<meta name="twitter:title" content="East v.s. West: NBA &#34;Players of the Week&#34;">
-<meta property="og:url" content="/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
-<meta property="twitter:url" content="/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+<meta property="og:title" content="LA Crime: What&#39;s It Like? (Pt.1)">
+<meta name="twitter:title" content="LA Crime: What&#39;s It Like? (Pt.1)">
+<meta property="og:url" content="/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
+<meta property="twitter:url" content="/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
 <meta property="og:site_name" content="Data &amp; Muse">
 <meta property="og:description" content="
 
@@ -35,22 +35,26 @@
 <meta property="og:locale" content="en-us">
 
   
-    <meta property="article:published_time" content="2020-08-30T00:00:00">
+    <meta property="article:published_time" content="2020-08-31T00:00:00">
   
   
-    <meta property="article:modified_time" content="2020-08-30T00:00:00">
+    <meta property="article:modified_time" content="2020-08-31T00:00:00">
   
-  
-  
-    
-      <meta property="article:section" content="Basketball">
-    
-      <meta property="article:section" content="Sports">
-    
   
   
     
-      <meta property="article:tag" content="classification">
+      <meta property="article:section" content="Crime">
+    
+      <meta property="article:section" content="Los Angeles">
+    
+  
+  
+    
+      <meta property="article:tag" content="EDA">
+    
+      <meta property="article:tag" content="visualization">
+    
+      <meta property="article:tag" content="feature-engineering">
     
   
 
@@ -71,14 +75,14 @@
   <meta property="twitter:image" content="/images/coo.jpg">
 
 
-    <title>East v.s. West: NBA &#34;Players of the Week&#34;</title>
+    <title>LA Crime: What&#39;s It Like? (Pt.1)</title>
 
     <link rel="icon" href="/favicon.png">
     
 
     
 
-    <link rel="canonical" href="/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+    <link rel="canonical" href="/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
 
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
@@ -228,15 +232,15 @@
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      East v.s. West: NBA &#34;Players of the Week&#34;
+      LA Crime: What&#39;s It Like? (Pt.1)
     </h1>
   
   
   <div class="postShorten-meta post-meta">
     
-      <time itemprop="datePublished" datetime="2020-08-30T00:00:00Z">
+      <time itemprop="datePublished" datetime="2020-08-31T00:00:00Z">
         
-  August 30, 2020
+  August 31, 2020
 
       </time>
     
@@ -245,9 +249,9 @@
   
     <span>in</span>
     
-      <a class="category-link" href="/categories/basketball">Basketball</a>, 
+      <a class="category-link" href="/categories/crime">Crime</a>, 
     
-      <a class="category-link" href="/categories/sports">Sports</a>
+      <a class="category-link" href="/categories/los-angeles">Los Angeles</a>
     
   
 
@@ -257,42 +261,13 @@
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <pre class="r"><code>data &lt;-read.csv(&quot;~/Desktop/Isaiah&#39;s Blog/blog/opening/datasets/datasets-44726-1009991-NBA_player_of_the_week.csv.xls&quot;)</code></pre>
-<pre class="r"><code>data %&gt;% head()</code></pre>
-<pre><code>##                  Player               Team Conference         Date Position
-## 1         Norman Powell    Toronto Raptors       East  Mar 9, 2020       SG
-## 2          LeBron James Los Angeles Lakers       West  Mar 9, 2020        F
-## 3 Giannis Antetokounmpo    Milwaukee Bucks       East  Mar 2, 2020        F
-## 4    Kristaps Porzingis   Dallas Mavericks       West  Mar 2, 2020       FC
-## 5          Jayson Tatum     Boston Celtics       East Feb 10, 2020       SF
-## 6          Nikola Jokic     Denver Nuggets       West Feb 10, 2020        C
-##   Height Weight Age Draft.Year Seasons.in.league    Season Season.short
-## 1    6&#39;4    215  26       2015                 4 2019-2020         2020
-## 2    6&#39;8    250  35       2003                16 2019-2020         2020
-## 3   6&#39;11    242  25       2013                 6 2019-2020         2020
-## 4    7&#39;3    240  24       2015                 4 2019-2020         2020
-## 5    6&#39;8    208  21       2017                 2 2019-2020         2020
-## 6    7&#39;0    250  25       2014                 4 2019-2020         2020
-##                            Pre.draft.Team Real_value Height.CM Weight.KG
-## 1                                    UCLA        0.5       193        97
-## 2 St. Vincent St. Mary High School (Ohio)        0.5       203       113
-## 3    Filathlitikos Div II Greece (Greece)        0.5       211       109
-## 4         Real Betis Energia Plus (Spain)        0.5       221       108
-## 5                                    Duke        0.5       203        94
-## 6                  KK Mega Bemax (Serbia)        0.5       213       113
-##   Last.Season
-## 1           1
-## 2           1
-## 3           1
-## 4           1
-## 5           1
-## 6           1</code></pre>
-<pre class="r"><code>eastern &lt;-  c(&quot;Atlanta Hawks&quot;, &quot;Boston Celtics&quot;,&quot;Charlotte Hornets&quot; ,&quot;Chicago Bulls&quot;,&quot;Cleveland Cavaliers&quot;, &quot;Detroit Pistons&quot;, &quot;Indiana Pacers&quot;,&quot;Miami Heat&quot;,&quot;Milwaukee Bucks&quot;,&quot;Brooklyn Nets&quot;,&quot;New York Knicks&quot;,&quot;Orlando Magic&quot;,&quot;Philadelphia Sixers&quot;,&quot;Toronto Raptors&quot;,&quot;Washington Wizards&quot;)
+              
 
-western &lt;- c(&quot;Dallas Mavericks&quot;,&quot;Denver Nuggets&quot;,&quot;Golden State Warriors&quot;,&quot;Houston Rockets&quot;,&quot;Los Angeles Clippers&quot;,&quot;Los Angeles Lakers&quot;,&quot;Memphis Grizzlies&quot;,&quot;Minnesota Timberwolves&quot;,&quot;New Orleans Pelicans&quot;,&quot;Oklahoma City Thunder&quot;,&quot;Phoenix Suns&quot;,&quot;Portland Trail Blazers&quot;,&quot;Sacramento Kings&quot;,&quot;San Antonio Spurs&quot;,&quot;Utah Jazz&quot;)
 
-data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;East&quot;, TRUE ~ &quot;West&quot; ), Conference = as.factor(Conference))</code></pre>
-<p><img src="/post/2020-08-30-east-v-s-west-nba-players-of-the-week.en-us_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="/post/2020-08-30-east-v-s-west-nba-players-of-the-week.en-us_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+
+
+HUGOMORE42
+
 
               
             </div>
@@ -305,7 +280,11 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small">TAGGED IN</span><br/>
                     
-  <a class="tag tag--primary tag--small" href="/tags/classification/">classification</a>
+  <a class="tag tag--primary tag--small" href="/tags/eda/">EDA</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/visualization/">visualization</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/feature-engineering/">feature-engineering</a>
 
                   </div>
                 
@@ -318,7 +297,7 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
           
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/la-crime-what-s-it-like-pt-1.en-us/" data-tooltip="LA Crime: What&#39;s It Like? (Pt.1)">
+                <a class="post-action-btn btn btn--disabled">
               
                   <i class="fa fa-angle-left"></i>
                   <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -326,7 +305,7 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
             </li>
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/first-post-classic-iris.en-us/" data-tooltip="First Post: Classic Iris">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/east-v-s-west-nba-players-of-the-week.en-us/" data-tooltip="East v.s. West: NBA &#34;Players of the Week&#34;">
               
                   <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
                   <i class="fa fa-angle-right"></i>
@@ -344,13 +323,13 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
         </li>
         
           <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
               <i class="fa fa-facebook-official"></i>
             </a>
           </li>
         
           <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
               <i class="fa fa-twitter"></i>
             </a>
           </li>
@@ -398,7 +377,7 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
           
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/la-crime-what-s-it-like-pt-1.en-us/" data-tooltip="LA Crime: What&#39;s It Like? (Pt.1)">
+                <a class="post-action-btn btn btn--disabled">
               
                   <i class="fa fa-angle-left"></i>
                   <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
@@ -406,7 +385,7 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
             </li>
             <li class="post-action">
               
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/first-post-classic-iris.en-us/" data-tooltip="First Post: Classic Iris">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/east-v-s-west-nba-players-of-the-week.en-us/" data-tooltip="East v.s. West: NBA &#34;Players of the Week&#34;">
               
                   <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
                   <i class="fa fa-angle-right"></i>
@@ -424,13 +403,13 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
         </li>
         
           <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
               <i class="fa fa-facebook-official"></i>
             </a>
           </li>
         
           <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2020/08/east-v-s-west-nba-players-of-the-week.en-us/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
               <i class="fa fa-twitter"></i>
             </a>
           </li>
@@ -460,13 +439,13 @@ data &lt;- data %&gt;% mutate(Conference = case_when(Team %in% eastern ~ &quot;E
   <ul class="share-options">
     
       <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2F2020%2F08%2Feast-v-s-west-nba-players-of-the-week.en-us%2F">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2F2020%2F08%2Fla-crime-what-s-it-like-pt-1.en-us%2F">
           <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
         </a>
       </li>
     
       <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%2F2020%2F08%2Feast-v-s-west-nba-players-of-the-week.en-us%2F">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%2F2020%2F08%2Fla-crime-what-s-it-like-pt-1.en-us%2F">
           <i class="fa fa-twitter"></i><span>Share on Twitter</span>
         </a>
       </li>
@@ -558,9 +537,9 @@ $(document).ready(function() {
     
       <script>
         var disqus_config = function () {
-          this.page.url = '\/2020\/08\/east-v-s-west-nba-players-of-the-week.en-us\/';
+          this.page.url = '\/2020\/08\/la-crime-what-s-it-like-pt-1.en-us\/';
           
-            this.page.identifier = '\/2020\/08\/east-v-s-west-nba-players-of-the-week.en-us\/'
+            this.page.identifier = '\/2020\/08\/la-crime-what-s-it-like-pt-1.en-us\/'
           
         };
         (function() {

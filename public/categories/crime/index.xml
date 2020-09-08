@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>EDA on Data &amp; Muse</title>
-    <link>/tags/eda/</link>
-    <description>Recent content in EDA on Data &amp; Muse</description>
+    <title>Crime on Data &amp; Muse</title>
+    <link>/categories/crime/</link>
+    <description>Recent content in Crime on Data &amp; Muse</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/eda/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/categories/crime/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,18 +17,6 @@
       <pubDate>Mon, 31 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>/2020/08/la-crime-what-s-it-like-pt-1.en-us/</guid>
-      <description>
-
-
-</description>
-    </item>
-    
-    <item>
-      <title>First Post: Classic Iris</title>
-      <link>/2020/08/first-post-classic-iris.en-us/</link>
-      <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/2020/08/first-post-classic-iris.en-us/</guid>
       <description>
 
 

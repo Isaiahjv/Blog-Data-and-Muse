@@ -1,0 +1,17 @@
+---
+title: 'LA Crime: What''s It Like? (Pt.1)'
+author: Isaiah Valencia
+date: '2020-08-31'
+slug: la-crime-what-s-it-like-pt-1.en-us
+categories:
+  - Crime
+  - Los Angeles
+tags:
+  - EDA
+  - visualization
+  - feature-engineering
+keywords:
+  - tech
+---
+
+<!--more-->
