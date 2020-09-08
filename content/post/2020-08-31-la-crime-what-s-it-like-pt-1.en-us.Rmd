@@ -23,18 +23,21 @@ library(RSocrata)
 ```
 
 ```{r}
-df <- read.socrata(
-  "https://data.lacity.org/resource/63jg-8b9z.json",
-  app_token = "SnCniTABd1CGB0PdZwiadOCof"
-)
+# df <- read.socrata(
+#   "https://data.lacity.org/resource/63jg-8b9z.json",
+#   app_token = "SnCniTABd1CGB0PdZwiadOCof"
+# )
 ```
 
 ```{r,message=FALSE}
-set.seed(123)
+# set.seed(123)
 library(tidyverse)
-df2 <- df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.7) %>% ungroup() %>% 
-  mutate(vict_age = as.numeric(vict_age))
+#dff <- df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.25) %>% ungroup() 
+#    mutate(vict_age = as.numeric(vict_age))
+# 
+# write.csv(df2,"~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv",row.names = F)
 
+df2 <- read.csv("~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv")
 ```
 
 
@@ -53,6 +56,7 @@ df2 <- df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.7) %>% ung
 
 ```{r, functions,echo=F,message=F}
 library(knitr)
+library(forcats)
   
 sex_disparity <- function(df2,bycount = F){
   #pass below in for top 20 crimes
@@ -63,14 +67,14 @@ sex_disparity <- function(df2,bycount = F){
   
   
   df2 <- df2 %>% 
-    filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>% 
+    filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>%
+    mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
     group_by(crm_cd,crm_cd_desc,vict_sex) %>% summarize(count = n()) %>%  
     mutate(percent = round(count/sum(count),6)) %>%
-      replace_na(list(vict_sex = "UNK")) %>% 
     pivot_wider(names_from = vict_sex, values_from = percent) %>% 
     transmute(f = F, m = M,UNK) %>% tidyr::fill(m,.direction = "updown") %>% 
     tidyr::fill(f,.direction = "updown") %>% tidyr::fill(UNK,.direction = "updown") %>%
-    replace_na(list(f = 0, m = 0)) %>% 
+    replace_na(list(f = 0, m = 0)) %>%
     distinct() %>% ungroup() %>% mutate(disparity = m-f,total_count = total)
   
   if(bycount == F){
@@ -240,7 +244,7 @@ df2 %>% group_by(vict_sex) %>% summarize(n = n() ) %>%
 variable interests: weapon_used_cd, sex, vict_sex
 ```{r}
 #total crime
-df %>% filter(crm_cd == '121') %>% mutate(vict_age = as.numeric(vict_age)) %>% ggplot(aes(x = vict_age)) + geom_histogram()
+df2 %>% filter(crm_cd == '121') %>% mutate(vict_age = as.numeric(vict_age)) %>% ggplot(aes(x = vict_age)) + geom_histogram()
 ```
 
 ```{r}
@@ -267,7 +271,18 @@ For all demographics, there are 4 plots that belong to 1 figure. The plots are i
 ```{r, fig.fullwidith = T,fig.cap = "In boxes boxes 1-4 are in order of highest disparities"}
 #df2 %>% victim_plot(grouping = "ethnicity",p_prop = T)
 
-df2 %>% victim_plot(grouping = "sex")
+#df2 %>% victim_plot(grouping = "sex")
+
+
+df2 %>% 
+    filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>%
+    mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
+    group_by(crm_cd,crm_cd_desc,vict_sex) %>% summarize(count = n()) %>%  
+    mutate(percent = round(count/sum(count),6)) %>%
+    pivot_wider(names_from = vict_sex, values_from = percent) %>% 
+    transmute(f = F, m = M,UNK) %>% tidyr::fill(m,.direction = "updown") %>% 
+    tidyr::fill(f,.direction = "updown") %>% tidyr::fill(UNK,.direction = "updown") %>%
+    replace_na(list(f = 0, m = 0))
 
 ```
 
@@ -322,4 +337,5 @@ df2 %>% victim_plot(grouping = "ethnicity")
 
 
 ```
+
 
