@@ -19,8 +19,8 @@
 
 ">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LA Crime: What&#39;s It Like? (Pt.1)">
-<meta name="twitter:title" content="LA Crime: What&#39;s It Like? (Pt.1)">
+<meta property="og:title" content="LA Crime: Who Are the Victims? (Pt.1)">
+<meta name="twitter:title" content="LA Crime: Who Are the Victims? (Pt.1)">
 <meta property="og:url" content="/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
 <meta property="twitter:url" content="/2020/08/la-crime-what-s-it-like-pt-1.en-us/">
 <meta property="og:site_name" content="Data &amp; Muse">
@@ -54,7 +54,7 @@
     
       <meta property="article:tag" content="visualization">
     
-      <meta property="article:tag" content="feature-engineering">
+      <meta property="article:tag" content="ggplot">
     
   
 
@@ -67,6 +67,9 @@
 
 
 
+  <meta property="og:image" content="/images/lacrime.JPG">
+  <meta property="twitter:image" content="/images/lacrime.JPG">
+
 
 
 
@@ -75,7 +78,7 @@
   <meta property="twitter:image" content="/images/coo.jpg">
 
 
-    <title>LA Crime: What&#39;s It Like? (Pt.1)</title>
+    <title>LA Crime: Who Are the Victims? (Pt.1)</title>
 
     <link rel="icon" href="/favicon.png">
     
@@ -232,7 +235,7 @@
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      LA Crime: What&#39;s It Like? (Pt.1)
+      LA Crime: Who Are the Victims? (Pt.1)
     </h1>
   
   
@@ -261,13 +264,594 @@
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              
+              <pre class="r"><code>library(RSocrata)</code></pre>
+<pre class="r"><code># df &lt;- read.socrata(
+#   &quot;https://data.lacity.org/resource/63jg-8b9z.json&quot;,
+#   app_token = &quot;SnCniTABd1CGB0PdZwiadOCof&quot;
+# )</code></pre>
+<pre class="r"><code># set.seed(123)
+library(tidyverse)
+#dff &lt;- df %&gt;% group_by(crm_cd,vict_sex,vict_descent) %&gt;% sample_frac(.25) %&gt;% ungroup() 
+#    mutate(vict_age = as.numeric(vict_age))
+# 
+# write.csv(df2,&quot;~/Desktop/Isaiah&#39;s Blog/blog/opening/datasets/lacrime.csv&quot;,row.names = F)
+
+df2 &lt;- read.csv(&quot;~/Desktop/Isaiah&#39;s Blog/blog/opening/datasets/lacrime.csv&quot;)</code></pre>
+<pre class="r"><code>#df2 %&gt;% ggplot(mapping = aes(vict_age)) + 
+#   geom_histogram(bins = 50)
+# 
+# df2 %&gt;% mutate(time_occ = as.numeric(time_occ)) %&gt;% ggplot(mapping = aes(time_occ)) + 
+#   geom_histogram(bins = 75)
+# 
+# df2 %&gt;% ggplot(mapping = aes(vict_age,colour = vict_descent )) + 
+#    geom_freqpoly(size = 0.75)</code></pre>
+<pre class="r"><code>samp &lt;- ggtitle(&quot;does it work?&quot;)
+df2 %&gt;% group_by(vict_sex) %&gt;% summarize(n = n() ) %&gt;%
+  mutate(value = round(n/sum(n),6)) %&gt;%
+  ggplot(aes(x=vict_sex, y = value, group=vict_sex)) +
+  geom_col(aes(fill = vict_sex)) +
+  samp</code></pre>
+<pre><code>## Warning: Factor `vict_sex` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<p><img src="/post/2020-08-31-la-crime-what-s-it-like-pt-1.en-us_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>variable interests: weapon_used_cd, sex, vict_sex</p>
+<pre class="r"><code>#total crime
+df2 %&gt;% filter(crm_cd == &#39;121&#39;) %&gt;% mutate(vict_age = as.numeric(vict_age)) %&gt;% ggplot(aes(x = vict_age)) + geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2020-08-31-la-crime-what-s-it-like-pt-1.en-us_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>#110    CRIMINAL HOMICIDE
+df2 %&gt;% ethnic_disparity(bycount = T,majority = T, w = T) #%&gt;% </code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd`</code></pre>
+<pre><code>## # A tibble: 134 x 6
+## # Groups:   crm_cd, crm_cd_desc [134]
+##    crm_cd crm_cd_desc            vict_descent ethnic_count disparity total_count
+##     &lt;int&gt; &lt;fct&gt;                  &lt;fct&gt;               &lt;int&gt;     &lt;dbl&gt;       &lt;int&gt;
+##  1    624 BATTERY - SIMPLE ASSA… B                   11810    0.0333       43646
+##  2    330 BURGLARY FROM VEHICLE  B                    5044    0.0142       34732
+##  3    440 THEFT PLAIN - PETTY (… B                    5981    0.0169       30348
+##  4    310 BURGLARY               B                    4846    0.0137       28996
+##  5    626 INTIMATE PARTNER - SI… B                    7357    0.0208       27134
+##  6    354 THEFT OF IDENTITY      B                    4839    0.0137       27067
+##  7    230 ASSAULT WITH DEADLY W… B                    7083    0.0200       21716
+##  8    740 VANDALISM - FELONY ($… B                    3903    0.0110       21571
+##  9    745 VANDALISM - MISDEAMEA… B                    4359    0.0123       18985
+## 10    210 ROBBERY                B                    3647    0.0103       17864
+## # … with 124 more rows</code></pre>
+<pre class="r"><code>  #filter(crm_cd == &#39;110&#39;) %&gt;% mutate(percent = disparity)
+
+df2  %&gt;% filter(vict_sex == &#39;F&#39;) %&gt;% ethnic_disparity(bycount = T,majority = &#39;F&#39;) %&gt;% filter(crm_cd == &#39;110&#39;) %&gt;% mutate(percent = disparity)</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd`</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## # A tibble: 5 x 7
+## # Groups:   crm_cd, crm_cd_desc [1]
+##   crm_cd crm_cd_desc     vict_descent ethnic_count disparity total_count percent
+##    &lt;int&gt; &lt;fct&gt;           &lt;fct&gt;               &lt;int&gt;     &lt;dbl&gt;       &lt;int&gt;   &lt;dbl&gt;
+## 1    110 CRIMINAL HOMIC… A                       2    0.0211          95  0.0211
+## 2    110 CRIMINAL HOMIC… B                      31    0.326           95  0.326 
+## 3    110 CRIMINAL HOMIC… H                      40    0.421           95  0.421 
+## 4    110 CRIMINAL HOMIC… O                       3    0.0316          95  0.0316
+## 5    110 CRIMINAL HOMIC… W                      19    0.2             95  0.2</code></pre>
+<pre class="r"><code>#white,black,asian,hispanic</code></pre>
+<div id="distribution-of-crimes-by-demographics" class="section level2 tabset">
+<h2>Distribution of crimes by demographics</h2>
+<p>For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of some variable, such as most common crimes. So the 1st plot will show the top x amount of crimes (most common), and the 4th plot will show the bottom x crimes (least common).</p>
+<div id="sex" class="section level3">
+<h3>sex</h3>
+<div id="between-sexes-ordered-by-most-commmon-crimes" class="section level4">
+<h4>Between sexes ordered by most commmon crimes</h4>
+<pre class="r"><code>#df2 %&gt;% victim_plot(grouping = &quot;ethnicity&quot;,p_prop = T)
+
+#df2 %&gt;% victim_plot(grouping = &quot;sex&quot;)
 
 
-
-
-HUGOMORE42
-
+df2 %&gt;% 
+    filter(vict_sex == &quot;M&quot; | vict_sex ==&quot;F&quot; | is.na(vict_sex) == T) %&gt;%
+    mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = &quot;UNK&quot;)) %&gt;%
+    group_by(crm_cd,crm_cd_desc,vict_sex) %&gt;% summarize(count = n()) %&gt;%  
+    mutate(percent = round(count/sum(count),6)) %&gt;%
+    pivot_wider(names_from = vict_sex, values_from = percent) %&gt;% 
+    transmute(f = F, m = M,UNK) %&gt;% tidyr::fill(m,.direction = &quot;updown&quot;) %&gt;% 
+    tidyr::fill(f,.direction = &quot;updown&quot;) %&gt;% tidyr::fill(UNK,.direction = &quot;updown&quot;) %&gt;%
+    replace_na(list(f = 0, m = 0))</code></pre>
+<pre><code>## # A tibble: 293 x 5
+## # Groups:   crm_cd, crm_cd_desc [18,090]
+##    crm_cd crm_cd_desc           f       m       UNK
+##     &lt;int&gt; &lt;fct&gt;             &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+##  1    110 CRIMINAL HOMICIDE 0.137 0.861    0.00144 
+##  2    110 CRIMINAL HOMICIDE 0.137 0.861    0.00144 
+##  3    110 CRIMINAL HOMICIDE 0.137 0.861    0.00144 
+##  4    121 RAPE, FORCIBLE    0.991 0.00931 NA       
+##  5    121 RAPE, FORCIBLE    0.991 0.00931 NA       
+##  6    122 RAPE, ATTEMPTED   0.989 0.0109  NA       
+##  7    122 RAPE, ATTEMPTED   0.989 0.0109  NA       
+##  8    210 ROBBERY           0.308 0.692    0.000548
+##  9    210 ROBBERY           0.308 0.692    0.000548
+## 10    210 ROBBERY           0.308 0.692    0.000548
+## # … with 283 more rows</code></pre>
+</div>
+<div id="between-sexes-ordered-by-highest-disparities-of-crimes" class="section level4">
+<h4>Between sexes ordered by highest disparities of crimes</h4>
+<pre class="r"><code>df2 %&gt;% victim_plot(grouping = &quot;sex&quot;, bycount = F)</code></pre>
+<pre><code>## Warning: Factor `vict_sex` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd`</code></pre>
+<pre><code>## 
+## 
+## crm_cd   crm_cd_desc                                                        f          m        UNK   disparity   total_count  vict_disp_dom   rank   grouping      
+## -------  ---------------------------------------------------------  ---------  ---------  ---------  ----------  ------------  --------------  -----  --------------
+## 353      DRUNK ROLL                                                  0.000000   1.000000         NA    1.000000             9  male_vict_dom   1      male_vict_dom 
+## 436      LYNCHING - ATTEMPTED                                        0.000000   1.000000         NA    1.000000             5  male_vict_dom   1      male_vict_dom 
+## 451      PURSE SNATCHING - ATTEMPT                                   1.000000   0.000000         NA    1.000000            11  fem_vict_dom    1      fem_vict_dom  
+## 830      INCEST (SEXUAL ACTS BETWEEN BLOOD RELATIVES)                1.000000   0.000000         NA    1.000000             2  fem_vict_dom    1      fem_vict_dom  
+## 840      BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM    0.000000   1.000000         NA    1.000000             5  male_vict_dom   1      male_vict_dom 
+## 884      FAILURE TO DISPERSE                                         0.000000   1.000000         NA    1.000000             3  male_vict_dom   1      male_vict_dom 
+## 948      BIGAMY                                                      1.000000   0.000000         NA    1.000000             2  fem_vict_dom    1      fem_vict_dom  
+## 121      RAPE, FORCIBLE                                              0.990694   0.009306         NA    0.981388          2579  fem_vict_dom    1      fem_vict_dom  
+## 122      RAPE, ATTEMPTED                                             0.989130   0.010870         NA    0.978260           276  fem_vict_dom    1      fem_vict_dom  
+## 822      HUMAN TRAFFICKING - COMMERCIAL SEX ACTS                     0.983193   0.016807         NA    0.966386           119  fem_vict_dom    1      fem_vict_dom  
+## 805      PIMPING                                                     0.974359   0.025641         NA    0.948718           117  fem_vict_dom    1      fem_vict_dom  
+## 890      FAILURE TO YIELD                                            0.036585   0.963415         NA    0.926830            82  male_vict_dom   1      male_vict_dom 
+## 622      BATTERY ON A FIREFIGHTER                                    0.038462   0.961538         NA    0.923076            78  male_vict_dom   1      male_vict_dom 
+## 921      HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE                   0.958333   0.041667         NA    0.916666            24  fem_vict_dom    1      fem_vict_dom  
+## 351      PURSE SNATCHING                                             0.945946   0.054054         NA    0.891892           296  fem_vict_dom    1      fem_vict_dom  
+## 845      SEX OFFENDER REGISTRANT OUT OF COMPLIANCE                   0.055556   0.944444         NA    0.888888           270  male_vict_dom   1      male_vict_dom 
+## 437      RESISTING ARREST                                            0.076709   0.921897   0.001395    0.845188           717  male_vict_dom   1      male_vict_dom 
+## 860      BATTERY WITH SEXUAL CONTACT                                 0.915957   0.084043         NA    0.831914          2820  fem_vict_dom    1      fem_vict_dom  
+## 932      PEEPING TOM                                                 0.908475   0.091525         NA    0.816950           295  fem_vict_dom    1      fem_vict_dom  
+## 815      SEXUAL PENETRATION W/FOREIGN OBJECT                         0.899557   0.100443         NA    0.799114           677  fem_vict_dom    1      fem_vict_dom  
+## 231      ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER                0.101064   0.896277   0.002660    0.795213           376  male_vict_dom   1      male_vict_dom 
+## 810      SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ    0.895413   0.103670   0.000917    0.791743          1090  fem_vict_dom    1      fem_vict_dom  
+## 347      GRAND THEFT / INSURANCE FRAUD                               0.111111   0.888889         NA    0.777778            18  male_vict_dom   1      male_vict_dom 
+## 435      LYNCHING                                                    0.111111   0.888889         NA    0.777778             9  male_vict_dom   1      male_vict_dom 
+## 623      BATTERY POLICE (SIMPLE)                                     0.132834   0.866230   0.000935    0.733396          1069  male_vict_dom   1      male_vict_dom 
+## 110      CRIMINAL HOMICIDE                                           0.137283   0.861272   0.001445    0.723989           692  male_vict_dom   1      male_vict_dom 
+## 763      STALKING                                                    0.858079   0.141921         NA    0.716158           458  fem_vict_dom    1      fem_vict_dom  
+## 944      CONSPIRACY                                                  0.142857   0.857143         NA    0.714286            14  male_vict_dom   1      male_vict_dom 
+## 443      SHOPLIFTING - ATTEMPT                                       0.146341   0.853659         NA    0.707318            41  male_vict_dom   1      male_vict_dom 
+## 753      DISCHARGE FIREARMS/SHOTS FIRED                              0.159061   0.840939         NA    0.681878           767  male_vict_dom   1      male_vict_dom 
+## 438      RECKLESS DRIVING                                            0.160000   0.840000         NA    0.680000            50  male_vict_dom   1      male_vict_dom 
+## 920      KIDNAPPING - GRAND ATTEMPT                                  0.836158   0.163842         NA    0.672316           177  fem_vict_dom    1      fem_vict_dom  
+## 442      SHOPLIFTING - PETTY THEFT ($950 &amp; UNDER)                    0.164902   0.834790   0.000308    0.669888          9727  male_vict_dom   1      male_vict_dom 
+## 813      CHILD ANNOYING (17YRS &amp; UNDER)                              0.831776   0.168224         NA    0.663552          1284  fem_vict_dom    2      fem_vict_dom  
+## 812      CRM AGNST CHLD (13 OR UNDER) (14-15 &amp; SUSP 10 YRS OLDER)    0.829787   0.169740   0.000473    0.660047          2115  fem_vict_dom    2      fem_vict_dom  
+## 760      LEWD/LASCIVIOUS ACTS WITH CHILD                             0.827586   0.172414         NA    0.655172            58  fem_vict_dom    2      fem_vict_dom  
+## 850      INDECENT EXPOSURE                                           0.810780   0.189220         NA    0.621560           872  fem_vict_dom    2      fem_vict_dom  
+## 806      PANDERING                                                   0.805195   0.194805         NA    0.610390            77  fem_vict_dom    2      fem_vict_dom  
+## 951      DEFRAUDING INNKEEPER/THEFT OF SERVICES, $400 &amp; UNDER        0.197753   0.802247         NA    0.604494           445  male_vict_dom   2      male_vict_dom 
+## 345      DISHONEST EMPLOYEE - GRAND THEFT                            0.200000   0.800000         NA    0.600000            35  male_vict_dom   2      male_vict_dom 
+## 626      INTIMATE PARTNER - SIMPLE ASSAULT                           0.797128   0.202802   0.000070    0.594326         28624  fem_vict_dom    2      fem_vict_dom  
+## 762      LEWD CONDUCT                                                0.791304   0.208696         NA    0.582608           345  fem_vict_dom    2      fem_vict_dom  
+## 343      SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)                    0.209121   0.790879         NA    0.581758           899  male_vict_dom   2      male_vict_dom 
+## 439      FALSE POLICE REPORT                                         0.216867   0.783133         NA    0.566266            83  male_vict_dom   2      male_vict_dom 
+## 910      KIDNAPPING                                                  0.781124   0.218876         NA    0.562248           498  fem_vict_dom    2      fem_vict_dom  
+## 485      BIKE - ATTEMPTED STOLEN                                     0.222222   0.777778         NA    0.555556             9  male_vict_dom   2      male_vict_dom 
+## 670      EMBEZZLEMENT, PETTY THEFT ($950 &amp; UNDER)                    0.222222   0.777778         NA    0.555556           117  male_vict_dom   2      male_vict_dom 
+## 474      THEFT, COIN MACHINE - PETTY ($950 &amp; UNDER)                  0.224490   0.775510         NA    0.551020            49  male_vict_dom   2      male_vict_dom 
+## 756      WEAPONS POSSESSION/BOMBING                                  0.225000   0.775000         NA    0.550000            40  male_vict_dom   2      male_vict_dom 
+## 236      INTIMATE PARTNER - AGGRAVATED ASSAULT                       0.774370   0.225630         NA    0.548740          3847  fem_vict_dom    2      fem_vict_dom  
+## 901      VIOLATION OF RESTRAINING ORDER                              0.771737   0.228056   0.000208    0.543681          4819  fem_vict_dom    2      fem_vict_dom  
+## 444      DISHONEST EMPLOYEE - PETTY THEFT                            0.240000   0.760000         NA    0.520000            25  male_vict_dom   2      male_vict_dom 
+## 434      FALSE IMPRISONMENT                                          0.757447   0.242553         NA    0.514894           235  fem_vict_dom    2      fem_vict_dom  
+## 446      PETTY THEFT - AUTO REPAIR                                   0.750000   0.250000         NA    0.500000             4  fem_vict_dom    2      fem_vict_dom  
+## 452      PICKPOCKET, ATTEMPT                                         0.250000   0.750000         NA    0.500000             4  male_vict_dom   2      male_vict_dom 
+## 924      TELEPHONE PROPERTY - DAMAGE                                 0.750000   0.250000         NA    0.500000             8  fem_vict_dom    2      fem_vict_dom  
+## 902      VIOLATION OF TEMPORARY RESTRAINING ORDER                    0.747922   0.252078         NA    0.495844           361  fem_vict_dom    2      fem_vict_dom  
+## 949      ILLEGAL DUMPING                                             0.254237   0.745763         NA    0.491526           118  male_vict_dom   2      male_vict_dom 
+## 820      ORAL COPULATION                                             0.741866   0.258134         NA    0.483732           461  fem_vict_dom    2      fem_vict_dom  
+## 950      DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $400           0.260870   0.739130         NA    0.478260            46  male_vict_dom   2      male_vict_dom 
+## 903      CONTEMPT OF COURT                                           0.738947   0.261053         NA    0.477894           950  fem_vict_dom    2      fem_vict_dom  
+## 660      COUNTERFEIT                                                 0.261111   0.738889         NA    0.477778           180  male_vict_dom   2      male_vict_dom 
+## 433      DRIVING WITHOUT OWNER CONSENT (DWOC)                        0.273585   0.726415         NA    0.452830           106  male_vict_dom   2      male_vict_dom 
+## 230      ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT              0.273484   0.726169   0.000347    0.452685         23069  male_vict_dom   2      male_vict_dom 
+## 755      BOMB SCARE                                                  0.275424   0.724576         NA    0.449152           236  male_vict_dom   2      male_vict_dom 
+## 250      SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT            0.279412   0.720588         NA    0.441176            68  male_vict_dom   2      male_vict_dom 
+## 931      REPLICA FIREARMS(SALE,DISPLAY,MANUFACTURE OR DISTRIBUTE)    0.285714   0.714286         NA    0.428572             7  male_vict_dom   3      male_vict_dom 
+## 942      BRIBERY                                                     0.285714   0.714286         NA    0.428572             7  male_vict_dom   3      male_vict_dom 
+## 480      BIKE - STOLEN                                               0.287921   0.712079         NA    0.424158          3560  male_vict_dom   3      male_vict_dom 
+## 220      ATTEMPTED ROBBERY                                           0.288942   0.710373   0.000685    0.421431          2921  male_vict_dom   3      male_vict_dom 
+## 522      VEHICLE - MOTORIZED SCOOTERS, BICYCLES, AND WHEELCHAIRS     0.300000   0.700000         NA    0.400000            10  male_vict_dom   3      male_vict_dom 
+## 880      DISRUPT SCHOOL                                              0.300000   0.700000         NA    0.400000            10  male_vict_dom   3      male_vict_dom 
+## 956      LETTERS, LEWD  -  TELEPHONE CALLS, LEWD                     0.693316   0.306684         NA    0.386632          5266  fem_vict_dom    3      fem_vict_dom  
+## 648      ARSON                                                       0.306197   0.692588   0.001215    0.386391           823  male_vict_dom   3      male_vict_dom 
+## 210      ROBBERY                                                     0.307631   0.691821   0.000548    0.384190         20076  male_vict_dom   3      male_vict_dom 
+## 520      VEHICLE - ATTEMPT STOLEN                                    0.318681   0.680098   0.001221    0.361417           819  male_vict_dom   3      male_vict_dom 
+## 441      THEFT PLAIN - ATTEMPT                                       0.332461   0.667539         NA    0.335078           382  male_vict_dom   3      male_vict_dom 
+## 349      GRAND THEFT / AUTO REPAIR                                   0.333333   0.666667         NA    0.333334             3  male_vict_dom   3      male_vict_dom 
+## 471      TILL TAP - PETTY ($950 &amp; UNDER)                             0.333333   0.666667         NA    0.333334            18  male_vict_dom   3      male_vict_dom 
+## 473      THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)                0.333333   0.666667         NA    0.333334             9  male_vict_dom   3      male_vict_dom 
+## 475      THEFT, COIN MACHINE - ATTEMPT                               0.666667   0.333333         NA    0.333334             3  fem_vict_dom    3      fem_vict_dom  
+## 652      DOCUMENT WORTHLESS ($200 &amp; UNDER)                           0.333333   0.666667         NA    0.333334            12  male_vict_dom   3      male_vict_dom 
+## 940      EXTORTION                                                   0.337984   0.662016         NA    0.324032           645  male_vict_dom   3      male_vict_dom 
+## 943      CRUELTY TO ANIMALS                                          0.331058   0.651877   0.017065    0.320819           293  male_vict_dom   3      male_vict_dom 
+## 761      BRANDISH WEAPON                                             0.347475   0.652525         NA    0.305050          3842  male_vict_dom   3      male_vict_dom 
+## 946      OTHER MISCELLANEOUS CRIME                                   0.351050   0.646849   0.002101    0.295799          4760  male_vict_dom   3      male_vict_dom 
+## 865      DRUGS, TO A MINOR                                           0.636364   0.363636         NA    0.272728            11  fem_vict_dom    3      fem_vict_dom  
+## 350      THEFT, PERSON                                               0.634338   0.365662         NA    0.268676          3681  fem_vict_dom    3      fem_vict_dom  
+## 450      THEFT FROM PERSON - ATTEMPT                                 0.633803   0.366197         NA    0.267606            71  fem_vict_dom    3      fem_vict_dom  
+## 954      CONTRIBUTING                                                0.630435   0.369565         NA    0.260870            46  fem_vict_dom    3      fem_vict_dom  
+## 331      THEFT FROM MOTOR VEHICLE - GRAND ($400 AND OVER)            0.380661   0.619084   0.000255    0.238423          7839  male_vict_dom   3      male_vict_dom 
+## 888      TRESPASSING                                                 0.387421   0.612159   0.000419    0.224738          4770  male_vict_dom   3      male_vict_dom 
+## 900      VIOLATION OF COURT ORDER                                    0.611404   0.388596         NA    0.222808          4928  fem_vict_dom    3      fem_vict_dom  
+## 933      PROWLER                                                     0.608108   0.391892         NA    0.216216           222  fem_vict_dom    3      fem_vict_dom  
+## 653      CREDIT CARDS, FRAUD USE ($950.01 &amp; OVER)                    0.393617   0.606383         NA    0.212766           188  male_vict_dom   3      male_vict_dom 
+## 668      EMBEZZLEMENT, GRAND THEFT ($950.01 &amp; OVER)                  0.085779   0.268623   0.645598    0.182844          1772  male_vict_dom   3      male_vict_dom 
+## 310      BURGLARY                                                    0.411409   0.588279   0.000312    0.176870         35269  male_vict_dom   3      male_vict_dom 
+## 740      VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS)     0.413980   0.585827   0.000194    0.171847         25837  male_vict_dom   3      male_vict_dom 
+## 647      THROWING OBJECT AT MOVING VEHICLE                           0.418719   0.581281         NA    0.162562           406  male_vict_dom   3      male_vict_dom 
+## 341      THEFT-GRAND ($950.01 &amp; OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD    0.420394   0.579047   0.000559    0.158653         17888  male_vict_dom   4      male_vict_dom 
+## 352      PICKPOCKET                                                  0.578313   0.421687         NA    0.156626           249  fem_vict_dom    4      fem_vict_dom  
+## 410      BURGLARY FROM VEHICLE, ATTEMPTED                            0.424501   0.575499         NA    0.150998           702  male_vict_dom   4      male_vict_dom 
+## 928      THREATENING PHONE CALLS/LETTERS                             0.575325   0.424675         NA    0.150650           770  fem_vict_dom    4      fem_vict_dom  
+## 661      UNAUTHORIZED COMPUTER ACCESS                                0.568571   0.431429         NA    0.137142           350  fem_vict_dom    4      fem_vict_dom  
+## 649      DOCUMENT FORGERY / STOLEN FELONY                            0.441710   0.557550   0.000740    0.115840          5404  male_vict_dom   4      male_vict_dom 
+## 651      DOCUMENT WORTHLESS ($200.01 &amp; OVER)                         0.444444   0.555556         NA    0.111112            81  male_vict_dom   4      male_vict_dom 
+## 330      BURGLARY FROM VEHICLE                                       0.446701   0.553175   0.000124    0.106474         40329  male_vict_dom   4      male_vict_dom 
+## 666      BUNCO, ATTEMPT                                              0.553073   0.446927         NA    0.106146           179  fem_vict_dom    4      fem_vict_dom  
+## 922      CHILD STEALING                                              0.445255   0.551095   0.003650    0.105840           274  male_vict_dom   4      male_vict_dom 
+## 930      CRIMINAL THREATS - NO WEAPON DISPLAYED                      0.549623   0.450164   0.000213    0.099459         14066  fem_vict_dom    4      fem_vict_dom  
+## 440      THEFT PLAIN - PETTY ($950 &amp; UNDER)                          0.458945   0.540667   0.000388    0.081722         36098  male_vict_dom   4      male_vict_dom 
+## 421      THEFT FROM MOTOR VEHICLE - ATTEMPT                          0.459283   0.540717         NA    0.081434           307  male_vict_dom   4      male_vict_dom 
+## 235      CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT                 0.467312   0.532688         NA    0.065376           413  male_vict_dom   4      male_vict_dom 
+## 662      BUNCO, GRAND THEFT                                          0.531418   0.468582         NA    0.062836          2228  fem_vict_dom    4      fem_vict_dom  
+## 420      THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)             0.287142   0.347232   0.365627    0.060090         22017  male_vict_dom   4      male_vict_dom 
+## 654      CREDIT CARDS, FRAUD USE ($950 &amp; UNDER                       0.472973   0.527027         NA    0.054054            74  male_vict_dom   4      male_vict_dom 
+## 745      VANDALISM - MISDEAMEANOR ($399 OR UNDER)                    0.472884   0.526841   0.000276    0.053957         21758  male_vict_dom   4      male_vict_dom 
+## 320      BURGLARY, ATTEMPTED                                         0.473018   0.526649   0.000333    0.053631          3002  male_vict_dom   4      male_vict_dom 
+## 251      SHOTS FIRED AT INHABITED DWELLING                           0.521104   0.478896         NA    0.042208           616  fem_vict_dom    4      fem_vict_dom  
+## 870      CHILD ABANDONMENT                                           0.480000   0.520000         NA    0.040000            25  male_vict_dom   4      male_vict_dom 
+## 624      BATTERY - SIMPLE ASSAULT                                    0.519455   0.480419   0.000126    0.039036         47571  fem_vict_dom    4      fem_vict_dom  
+## 664      BUNCO, PETTY THEFT                                          0.488249   0.510993   0.000758    0.022744          1319  male_vict_dom   4      male_vict_dom 
+## 814      CHILD PORNOGRAPHY                                           0.490909   0.509091         NA    0.018182            55  male_vict_dom   4      male_vict_dom 
+## 237      CHILD NEGLECT (SEE 300 W.I.C.)                              0.491603   0.506870   0.001527    0.015267          1310  male_vict_dom   4      male_vict_dom 
+## 487      BOAT - STOLEN                                               0.000000   0.014085   0.985915    0.014085            71  male_vict_dom   4      male_vict_dom 
+## 886      DISTURBING THE PEACE                                        0.494493   0.505507         NA    0.011014           908  male_vict_dom   4      male_vict_dom 
+## 354      THEFT OF IDENTITY                                           0.504028   0.495815   0.000158    0.008213         31657  fem_vict_dom    4      fem_vict_dom  
+## 625      OTHER ASSAULT                                               0.502449   0.497551         NA    0.004898          1021  fem_vict_dom    4      fem_vict_dom  
+## 627      CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT                     0.501293   0.497845   0.000862    0.003448          2320  fem_vict_dom    4      fem_vict_dom  
+## 510      VEHICLE - STOLEN                                            0.001427   0.003279   0.995294    0.001852         39952  male_vict_dom   4      male_vict_dom 
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                     0.500000   0.500000         NA    0.000000             2  fem_vict_dom    4      fem_vict_dom  
+## 821      SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH     0.500000   0.500000         NA    0.000000           372  fem_vict_dom    4      fem_vict_dom  
+## 952      ABORTION/ILLEGAL                                            0.500000   0.500000         NA    0.000000             2  fem_vict_dom    4      fem_vict_dom</code></pre>
+<p><img src="/post/2020-08-31-la-crime-what-s-it-like-pt-1.en-us_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="ethnic-descent" class="section level3">
+<h3>Ethnic Descent</h3>
+<div id="between-ethnic-descents-ordered-by-most-commmon-crimes" class="section level4">
+<h4>Between Ethnic Descents Ordered by Most Commmon Crimes</h4>
+<pre class="r"><code>df2 %&gt;% victim_plot(grouping = &quot;ethnicity&quot;)</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd`</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd_desc`</code></pre>
+<pre><code>## 
+## 
+## crm_cd   crm_cd_desc                                                vict_descent    ethnic_count   disparity   total_count  rank   grouping 
+## -------  ---------------------------------------------------------  -------------  -------------  ----------  ------------  -----  ---------
+## 624      BATTERY - SIMPLE ASSAULT                                   H                      21467    0.450675         47633  1      H        
+## 330      BURGLARY FROM VEHICLE                                      H                      14316    0.353159         40537  1      H        
+## 510      VEHICLE - STOLEN                                           NA                     39765    0.994996         39965  1      NA       
+## 440      THEFT PLAIN - PETTY ($950 &amp; UNDER)                         W                      12033    0.321257         37456  1      W        
+## 310      BURGLARY                                                   W                      13296    0.360218         36911  1      W        
+## 354      THEFT OF IDENTITY                                          W                      11005    0.346058         31801  1      W        
+## 626      INTIMATE PARTNER - SIMPLE ASSAULT                          H                      14788    0.516431         28635  1      H        
+## 740      VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS)    H                       9899    0.361845         27357  1      H        
+## 230      ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT             H                      11289    0.487225         23170  1      H        
+## 745      VANDALISM - MISDEAMEANOR ($399 OR UNDER)                   H                       8541    0.377853         22604  1      H        
+## 420      THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)            NA                      8050    0.363990         22116  1      NA       
+## 210      ROBBERY                                                    H                      10724    0.511568         20963  1      H        
+## 341      THEFT-GRAND ($950.01 &amp; OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD   W                       7642    0.410067         18636  1      W        
+## 930      CRIMINAL THREATS - NO WEAPON DISPLAYED                     H                       6255    0.441862         14156  1      H        
+## 442      SHOPLIFTING - PETTY THEFT ($950 &amp; UNDER)                   X                       3459    0.285939         12097  1      X        
+## 331      THEFT FROM MOTOR VEHICLE - GRAND ($400 AND OVER)           W                       3123    0.394867          7909  1      W        
+## 649      DOCUMENT FORGERY / STOLEN FELONY                           W                       2064    0.362232          5698  1      W        
+## 888      TRESPASSING                                                W                       1868    0.346311          5394  1      W        
+## 956      LETTERS, LEWD  -  TELEPHONE CALLS, LEWD                    H                       1877    0.354218          5299  1      H        
+## 946      OTHER MISCELLANEOUS CRIME                                  H                       1500    0.290135          5170  1      H        
+## 900      VIOLATION OF COURT ORDER                                   H                       2378    0.475030          5006  1      H        
+## 901      VIOLATION OF RESTRAINING ORDER                             H                       2480    0.513458          4830  1      H        
+## 761      BRANDISH WEAPON                                            H                       1896    0.490303          3867  1      H        
+## 236      INTIMATE PARTNER - AGGRAVATED ASSAULT                      H                       1759    0.457002          3849  1      H        
+## 350      THEFT, PERSON                                              H                       1804    0.488492          3693  1      H        
+## 480      BIKE - STOLEN                                              W                       1656    0.462312          3582  1      W        
+## 320      BURGLARY, ATTEMPTED                                        W                       1122    0.358466          3130  1      W        
+## 220      ATTEMPTED ROBBERY                                          H                       1735    0.579492          2994  1      H        
+## 860      BATTERY WITH SEXUAL CONTACT                                H                       1429    0.506378          2822  1      H        
+## 121      RAPE, FORCIBLE                                             H                       1062    0.411468          2581  1      H        
+## 627      CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT                    H                       1446    0.623007          2321  1      H        
+## 662      BUNCO, GRAND THEFT                                         W                        761    0.334653          2274  1      W        
+## 812      CRM AGNST CHLD (13 OR UNDER) (14-15 &amp; SUSP 10 YRS OLDER)   H                       1574    0.744208          2115  1      H        
+## 668      EMBEZZLEMENT, GRAND THEFT ($950.01 &amp; OVER)                 NA                      1144    0.570574          2005  1      NA       
+## 664      BUNCO, PETTY THEFT                                         H                        564    0.416236          1355  1      H        
+## 237      CHILD NEGLECT (SEE 300 W.I.C.)                             H                        801    0.610518          1312  1      H        
+## 813      CHILD ANNOYING (17YRS &amp; UNDER)                             H                        896    0.697819          1284  1      H        
+## 623      BATTERY POLICE (SIMPLE)                                    H                        410    0.336894          1217  1      H        
+## 343      SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)                   X                        443    0.375106          1181  2      X        
+## 810      SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ   H                        815    0.746337          1092  2      H        
+## 625      OTHER ASSAULT                                              H                        402    0.392962          1023  2      H        
+## 903      CONTEMPT OF COURT                                          H                        494    0.516736           956  2      H        
+## 753      DISCHARGE FIREARMS/SHOTS FIRED                             X                        251    0.264489           949  2      X        
+## 886      DISTURBING THE PEACE                                       W                        381    0.413681           921  2      W        
+## 648      ARSON                                                      H                        277    0.314773           880  2      H        
+## 850      INDECENT EXPOSURE                                          H                        491    0.559863           877  2      H        
+## 520      VEHICLE - ATTEMPT STOLEN                                   H                        445    0.532934           835  2      H        
+## 437      RESISTING ARREST                                           H                        225    0.276074           815  2      H        
+## 928      THREATENING PHONE CALLS/LETTERS                            H                        296    0.381443           776  2      H        
+## 410      BURGLARY FROM VEHICLE, ATTEMPTED                           H                        304    0.427567           711  2      H        
+## 110      CRIMINAL HOMICIDE                                          H                        334    0.482659           692  2      H        
+## 815      SEXUAL PENETRATION W/FOREIGN OBJECT                        H                        308    0.452941           680  2      H        
+## 940      EXTORTION                                                  H                        326    0.500000           652  2      H        
+## 251      SHOTS FIRED AT INHABITED DWELLING                          H                        302    0.479365           630  2      H        
+## 951      DEFRAUDING INNKEEPER/THEFT OF SERVICES, $400 &amp; UNDER       O                        136    0.251386           541  2      O        
+## 910      KIDNAPPING                                                 H                        271    0.542000           500  2      H        
+## 820      ORAL COPULATION                                            H                        188    0.407809           461  2      H        
+## 763      STALKING                                                   H                        191    0.417031           458  2      H        
+## 845      SEX OFFENDER REGISTRANT OUT OF COMPLIANCE                  X                        198    0.472554           419  2      X        
+## 235      CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT                H                        225    0.542169           415  2      H        
+## 441      THEFT PLAIN - ATTEMPT                                      H                        126    0.305085           413  2      H        
+## 441      THEFT PLAIN - ATTEMPT                                      W                        126    0.305085           413  2      W        
+## 647      THROWING OBJECT AT MOVING VEHICLE                          H                        179    0.433414           413  2      H        
+## 231      ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER               H                        130    0.325000           400  2      H        
+## 821      SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH    H                        175    0.470430           372  2      H        
+## 661      UNAUTHORIZED COMPUTER ACCESS                               W                        183    0.502747           364  2      W        
+## 902      VIOLATION OF TEMPORARY RESTRAINING ORDER                   H                        169    0.466851           362  2      H        
+## 762      LEWD CONDUCT                                               H                        170    0.487106           349  2      H        
+## 943      CRUELTY TO ANIMALS                                         W                         78    0.246057           317  2      W        
+## 421      THEFT FROM MOTOR VEHICLE - ATTEMPT                         H                        119    0.385113           309  2      H        
+## 351      PURSE SNATCHING                                            H                        148    0.500000           296  2      H        
+## 755      BOMB SCARE                                                 X                         84    0.283784           296  2      X        
+## 932      PEEPING TOM                                                H                        117    0.396610           295  2      H        
+## 922      CHILD STEALING                                             H                        128    0.460432           278  2      H        
+## 122      RAPE, ATTEMPTED                                            H                        129    0.467391           276  2      H        
+## 352      PICKPOCKET                                                 W                         87    0.349398           249  3      W        
+## 434      FALSE IMPRISONMENT                                         H                        119    0.497908           239  3      H        
+## 933      PROWLER                                                    W                        106    0.452991           234  3      W        
+## 660      COUNTERFEIT                                                H                         61    0.291866           209  3      H        
+## 653      CREDIT CARDS, FRAUD USE ($950.01 &amp; OVER)                   W                         82    0.410000           200  3      W        
+## 666      BUNCO, ATTEMPT                                             H                         66    0.356757           185  3      H        
+## 920      KIDNAPPING - GRAND ATTEMPT                                 H                        111    0.627119           177  3      H        
+## 670      EMBEZZLEMENT, PETTY THEFT ($950 &amp; UNDER)                   W                         40    0.272109           147  3      W        
+## 890      FAILURE TO YIELD                                           X                         57    0.445312           128  3      X        
+## 949      ILLEGAL DUMPING                                            W                         47    0.367188           128  3      W        
+## 822      HUMAN TRAFFICKING - COMMERCIAL SEX ACTS                    B                         74    0.621849           119  3      B        
+## 805      PIMPING                                                    B                         65    0.555556           117  3      B        
+## 433      DRIVING WITHOUT OWNER CONSENT (DWOC)                       H                         45    0.391304           115  3      H        
+## 439      FALSE POLICE REPORT                                        W                         34    0.336634           101  3      W        
+## 651      DOCUMENT WORTHLESS ($200.01 &amp; OVER)                        W                         23    0.247312            93  3      W        
+## 806      PANDERING                                                  B                         20    0.243902            82  3      B        
+## 806      PANDERING                                                  H                         20    0.243902            82  3      H        
+## 622      BATTERY ON A FIREFIGHTER                                   W                         46    0.575000            80  3      W        
+## 654      CREDIT CARDS, FRAUD USE ($950 &amp; UNDER                      W                         24    0.307692            78  3      W        
+## 250      SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT           H                         36    0.486486            74  3      H        
+## 450      THEFT FROM PERSON - ATTEMPT                                H                         40    0.563380            71  3      H        
+## 487      BOAT - STOLEN                                              NA                        70    0.985915            71  3      NA       
+## 438      RECKLESS DRIVING                                           W                         19    0.292308            65  3      W        
+## 438      RECKLESS DRIVING                                           X                         19    0.292308            65  3      X        
+## 950      DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $400          W                         17    0.283333            60  3      W        
+## 950      DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $400          X                         17    0.283333            60  3      X        
+## 443      SHOPLIFTING - ATTEMPT                                      X                         22    0.372881            59  3      X        
+## 474      THEFT, COIN MACHINE - PETTY ($950 &amp; UNDER)                 W                         19    0.322034            59  3      W        
+## 760      LEWD/LASCIVIOUS ACTS WITH CHILD                            H                         42    0.724138            58  3      H        
+## 814      CHILD PORNOGRAPHY                                          H                         28    0.500000            56  3      H        
+## 954      CONTRIBUTING                                               H                         26    0.565217            46  3      H        
+## 756      WEAPONS POSSESSION/BOMBING                                 W                         18    0.400000            45  3      W        
+## 345      DISHONEST EMPLOYEE - GRAND THEFT                           W                         14    0.333333            42  3      W        
+## 444      DISHONEST EMPLOYEE - PETTY THEFT                           W                          8    0.258065            31  3      W        
+## 444      DISHONEST EMPLOYEE - PETTY THEFT                           X                          8    0.258065            31  3      X        
+## 870      CHILD ABANDONMENT                                          H                         13    0.520000            25  3      H        
+## 921      HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE                  B                         13    0.541667            24  3      B        
+## 471      TILL TAP - PETTY ($950 &amp; UNDER)                            H                          7    0.304348            23  3      H        
+## 347      GRAND THEFT / INSURANCE FRAUD                              W                         10    0.526316            19  4      W        
+## 652      DOCUMENT WORTHLESS ($200 &amp; UNDER)                          W                          4    0.266667            15  4      W        
+## 944      CONSPIRACY                                                 H                          7    0.500000            14  4      H        
+## 522      VEHICLE - MOTORIZED SCOOTERS, BICYCLES, AND WHEELCHAIRS    W                          6    0.500000            12  4      W        
+## 865      DRUGS, TO A MINOR                                          H                          8    0.666667            12  4      H        
+## 451      PURSE SNATCHING - ATTEMPT                                  H                          6    0.545455            11  4      H        
+## 880      DISRUPT SCHOOL                                             B                          3    0.272727            11  4      B        
+## 880      DISRUPT SCHOOL                                             W                          3    0.272727            11  4      W        
+## 880      DISRUPT SCHOOL                                             X                          3    0.272727            11  4      X        
+## 435      LYNCHING                                                   H                          4    0.400000            10  4      H        
+## 473      THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)               H                          3    0.300000            10  4      H        
+## 473      THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)               W                          3    0.300000            10  4      W        
+## 353      DRUNK ROLL                                                 H                          4    0.444444             9  4      H        
+## 485      BIKE - ATTEMPTED STOLEN                                    H                          4    0.444444             9  4      H        
+## 924      TELEPHONE PROPERTY - DAMAGE                                H                          5    0.625000             8  4      H        
+## 931      REPLICA FIREARMS(SALE,DISPLAY,MANUFACTURE OR DISTRIBUTE)   H                          3    0.428571             7  4      H        
+## 942      BRIBERY                                                    H                          3    0.428571             7  4      H        
+## 942      BRIBERY                                                    W                          3    0.428571             7  4      W        
+## 436      LYNCHING - ATTEMPTED                                       H                          2    0.333333             6  4      H        
+## 446      PETTY THEFT - AUTO REPAIR                                  H                          2    0.400000             5  4      H        
+## 446      PETTY THEFT - AUTO REPAIR                                  W                          2    0.400000             5  4      W        
+## 475      THEFT, COIN MACHINE - ATTEMPT                              H                          2    0.400000             5  4      H        
+## 475      THEFT, COIN MACHINE - ATTEMPT                              X                          2    0.400000             5  4      X        
+## 840      BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM   O                          2    0.400000             5  4      O        
+## 840      BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM   W                          2    0.400000             5  4      W        
+## 452      PICKPOCKET, ATTEMPT                                        H                          2    0.500000             4  4      H        
+## 452      PICKPOCKET, ATTEMPT                                        W                          2    0.500000             4  4      W        
+## 349      GRAND THEFT / AUTO REPAIR                                  H                          2    0.666667             3  4      H        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    B                          1    0.333333             3  4      B        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    H                          1    0.333333             3  4      H        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    X                          1    0.333333             3  4      X        
+## 884      FAILURE TO DISPERSE                                        W                          2    0.666667             3  4      W        
+## 830      INCEST (SEXUAL ACTS BETWEEN BLOOD RELATIVES)               H                          2    1.000000             2  4      H        
+## 948      BIGAMY                                                     H                          1    0.500000             2  4      H        
+## 948      BIGAMY                                                     W                          1    0.500000             2  4      W        
+## 952      ABORTION/ILLEGAL                                           H                          2    1.000000             2  4      H</code></pre>
+<p><img src="/post/2020-08-31-la-crime-what-s-it-like-pt-1.en-us_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="between-ethnic-descents-ordered-by-highest-reprentation-for-crimes" class="section level4">
+<h4>Between Ethnic Descents Ordered by Highest Reprentation for Crimes</h4>
+<pre class="r"><code>df2 %&gt;% victim_plot(grouping = &quot;ethnicity&quot;)</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd`</code></pre>
+<pre><code>## Warning: Factor `vict_descent` contains implicit NA, consider using
+## `forcats::fct_explicit_na`</code></pre>
+<pre><code>## Adding missing grouping variables: `crm_cd_desc`</code></pre>
+<pre><code>## 
+## 
+## crm_cd   crm_cd_desc                                                vict_descent    ethnic_count   disparity   total_count  rank   grouping 
+## -------  ---------------------------------------------------------  -------------  -------------  ----------  ------------  -----  ---------
+## 624      BATTERY - SIMPLE ASSAULT                                   H                      21467    0.450675         47633  1      H        
+## 330      BURGLARY FROM VEHICLE                                      H                      14316    0.353159         40537  1      H        
+## 510      VEHICLE - STOLEN                                           NA                     39765    0.994996         39965  1      NA       
+## 440      THEFT PLAIN - PETTY ($950 &amp; UNDER)                         W                      12033    0.321257         37456  1      W        
+## 310      BURGLARY                                                   W                      13296    0.360218         36911  1      W        
+## 354      THEFT OF IDENTITY                                          W                      11005    0.346058         31801  1      W        
+## 626      INTIMATE PARTNER - SIMPLE ASSAULT                          H                      14788    0.516431         28635  1      H        
+## 740      VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS)    H                       9899    0.361845         27357  1      H        
+## 230      ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT             H                      11289    0.487225         23170  1      H        
+## 745      VANDALISM - MISDEAMEANOR ($399 OR UNDER)                   H                       8541    0.377853         22604  1      H        
+## 420      THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)            NA                      8050    0.363990         22116  1      NA       
+## 210      ROBBERY                                                    H                      10724    0.511568         20963  1      H        
+## 341      THEFT-GRAND ($950.01 &amp; OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD   W                       7642    0.410067         18636  1      W        
+## 930      CRIMINAL THREATS - NO WEAPON DISPLAYED                     H                       6255    0.441862         14156  1      H        
+## 442      SHOPLIFTING - PETTY THEFT ($950 &amp; UNDER)                   X                       3459    0.285939         12097  1      X        
+## 331      THEFT FROM MOTOR VEHICLE - GRAND ($400 AND OVER)           W                       3123    0.394867          7909  1      W        
+## 649      DOCUMENT FORGERY / STOLEN FELONY                           W                       2064    0.362232          5698  1      W        
+## 888      TRESPASSING                                                W                       1868    0.346311          5394  1      W        
+## 956      LETTERS, LEWD  -  TELEPHONE CALLS, LEWD                    H                       1877    0.354218          5299  1      H        
+## 946      OTHER MISCELLANEOUS CRIME                                  H                       1500    0.290135          5170  1      H        
+## 900      VIOLATION OF COURT ORDER                                   H                       2378    0.475030          5006  1      H        
+## 901      VIOLATION OF RESTRAINING ORDER                             H                       2480    0.513458          4830  1      H        
+## 761      BRANDISH WEAPON                                            H                       1896    0.490303          3867  1      H        
+## 236      INTIMATE PARTNER - AGGRAVATED ASSAULT                      H                       1759    0.457002          3849  1      H        
+## 350      THEFT, PERSON                                              H                       1804    0.488492          3693  1      H        
+## 480      BIKE - STOLEN                                              W                       1656    0.462312          3582  1      W        
+## 320      BURGLARY, ATTEMPTED                                        W                       1122    0.358466          3130  1      W        
+## 220      ATTEMPTED ROBBERY                                          H                       1735    0.579492          2994  1      H        
+## 860      BATTERY WITH SEXUAL CONTACT                                H                       1429    0.506378          2822  1      H        
+## 121      RAPE, FORCIBLE                                             H                       1062    0.411468          2581  1      H        
+## 627      CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT                    H                       1446    0.623007          2321  1      H        
+## 662      BUNCO, GRAND THEFT                                         W                        761    0.334653          2274  1      W        
+## 812      CRM AGNST CHLD (13 OR UNDER) (14-15 &amp; SUSP 10 YRS OLDER)   H                       1574    0.744208          2115  1      H        
+## 668      EMBEZZLEMENT, GRAND THEFT ($950.01 &amp; OVER)                 NA                      1144    0.570574          2005  1      NA       
+## 664      BUNCO, PETTY THEFT                                         H                        564    0.416236          1355  1      H        
+## 237      CHILD NEGLECT (SEE 300 W.I.C.)                             H                        801    0.610518          1312  1      H        
+## 813      CHILD ANNOYING (17YRS &amp; UNDER)                             H                        896    0.697819          1284  1      H        
+## 623      BATTERY POLICE (SIMPLE)                                    H                        410    0.336894          1217  1      H        
+## 343      SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)                   X                        443    0.375106          1181  2      X        
+## 810      SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ   H                        815    0.746337          1092  2      H        
+## 625      OTHER ASSAULT                                              H                        402    0.392962          1023  2      H        
+## 903      CONTEMPT OF COURT                                          H                        494    0.516736           956  2      H        
+## 753      DISCHARGE FIREARMS/SHOTS FIRED                             X                        251    0.264489           949  2      X        
+## 886      DISTURBING THE PEACE                                       W                        381    0.413681           921  2      W        
+## 648      ARSON                                                      H                        277    0.314773           880  2      H        
+## 850      INDECENT EXPOSURE                                          H                        491    0.559863           877  2      H        
+## 520      VEHICLE - ATTEMPT STOLEN                                   H                        445    0.532934           835  2      H        
+## 437      RESISTING ARREST                                           H                        225    0.276074           815  2      H        
+## 928      THREATENING PHONE CALLS/LETTERS                            H                        296    0.381443           776  2      H        
+## 410      BURGLARY FROM VEHICLE, ATTEMPTED                           H                        304    0.427567           711  2      H        
+## 110      CRIMINAL HOMICIDE                                          H                        334    0.482659           692  2      H        
+## 815      SEXUAL PENETRATION W/FOREIGN OBJECT                        H                        308    0.452941           680  2      H        
+## 940      EXTORTION                                                  H                        326    0.500000           652  2      H        
+## 251      SHOTS FIRED AT INHABITED DWELLING                          H                        302    0.479365           630  2      H        
+## 951      DEFRAUDING INNKEEPER/THEFT OF SERVICES, $400 &amp; UNDER       O                        136    0.251386           541  2      O        
+## 910      KIDNAPPING                                                 H                        271    0.542000           500  2      H        
+## 820      ORAL COPULATION                                            H                        188    0.407809           461  2      H        
+## 763      STALKING                                                   H                        191    0.417031           458  2      H        
+## 845      SEX OFFENDER REGISTRANT OUT OF COMPLIANCE                  X                        198    0.472554           419  2      X        
+## 235      CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT                H                        225    0.542169           415  2      H        
+## 441      THEFT PLAIN - ATTEMPT                                      H                        126    0.305085           413  2      H        
+## 441      THEFT PLAIN - ATTEMPT                                      W                        126    0.305085           413  2      W        
+## 647      THROWING OBJECT AT MOVING VEHICLE                          H                        179    0.433414           413  2      H        
+## 231      ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER               H                        130    0.325000           400  2      H        
+## 821      SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH    H                        175    0.470430           372  2      H        
+## 661      UNAUTHORIZED COMPUTER ACCESS                               W                        183    0.502747           364  2      W        
+## 902      VIOLATION OF TEMPORARY RESTRAINING ORDER                   H                        169    0.466851           362  2      H        
+## 762      LEWD CONDUCT                                               H                        170    0.487106           349  2      H        
+## 943      CRUELTY TO ANIMALS                                         W                         78    0.246057           317  2      W        
+## 421      THEFT FROM MOTOR VEHICLE - ATTEMPT                         H                        119    0.385113           309  2      H        
+## 351      PURSE SNATCHING                                            H                        148    0.500000           296  2      H        
+## 755      BOMB SCARE                                                 X                         84    0.283784           296  2      X        
+## 932      PEEPING TOM                                                H                        117    0.396610           295  2      H        
+## 922      CHILD STEALING                                             H                        128    0.460432           278  2      H        
+## 122      RAPE, ATTEMPTED                                            H                        129    0.467391           276  2      H        
+## 352      PICKPOCKET                                                 W                         87    0.349398           249  3      W        
+## 434      FALSE IMPRISONMENT                                         H                        119    0.497908           239  3      H        
+## 933      PROWLER                                                    W                        106    0.452991           234  3      W        
+## 660      COUNTERFEIT                                                H                         61    0.291866           209  3      H        
+## 653      CREDIT CARDS, FRAUD USE ($950.01 &amp; OVER)                   W                         82    0.410000           200  3      W        
+## 666      BUNCO, ATTEMPT                                             H                         66    0.356757           185  3      H        
+## 920      KIDNAPPING - GRAND ATTEMPT                                 H                        111    0.627119           177  3      H        
+## 670      EMBEZZLEMENT, PETTY THEFT ($950 &amp; UNDER)                   W                         40    0.272109           147  3      W        
+## 890      FAILURE TO YIELD                                           X                         57    0.445312           128  3      X        
+## 949      ILLEGAL DUMPING                                            W                         47    0.367188           128  3      W        
+## 822      HUMAN TRAFFICKING - COMMERCIAL SEX ACTS                    B                         74    0.621849           119  3      B        
+## 805      PIMPING                                                    B                         65    0.555556           117  3      B        
+## 433      DRIVING WITHOUT OWNER CONSENT (DWOC)                       H                         45    0.391304           115  3      H        
+## 439      FALSE POLICE REPORT                                        W                         34    0.336634           101  3      W        
+## 651      DOCUMENT WORTHLESS ($200.01 &amp; OVER)                        W                         23    0.247312            93  3      W        
+## 806      PANDERING                                                  B                         20    0.243902            82  3      B        
+## 806      PANDERING                                                  H                         20    0.243902            82  3      H        
+## 622      BATTERY ON A FIREFIGHTER                                   W                         46    0.575000            80  3      W        
+## 654      CREDIT CARDS, FRAUD USE ($950 &amp; UNDER                      W                         24    0.307692            78  3      W        
+## 250      SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT           H                         36    0.486486            74  3      H        
+## 450      THEFT FROM PERSON - ATTEMPT                                H                         40    0.563380            71  3      H        
+## 487      BOAT - STOLEN                                              NA                        70    0.985915            71  3      NA       
+## 438      RECKLESS DRIVING                                           W                         19    0.292308            65  3      W        
+## 438      RECKLESS DRIVING                                           X                         19    0.292308            65  3      X        
+## 950      DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $400          W                         17    0.283333            60  3      W        
+## 950      DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $400          X                         17    0.283333            60  3      X        
+## 443      SHOPLIFTING - ATTEMPT                                      X                         22    0.372881            59  3      X        
+## 474      THEFT, COIN MACHINE - PETTY ($950 &amp; UNDER)                 W                         19    0.322034            59  3      W        
+## 760      LEWD/LASCIVIOUS ACTS WITH CHILD                            H                         42    0.724138            58  3      H        
+## 814      CHILD PORNOGRAPHY                                          H                         28    0.500000            56  3      H        
+## 954      CONTRIBUTING                                               H                         26    0.565217            46  3      H        
+## 756      WEAPONS POSSESSION/BOMBING                                 W                         18    0.400000            45  3      W        
+## 345      DISHONEST EMPLOYEE - GRAND THEFT                           W                         14    0.333333            42  3      W        
+## 444      DISHONEST EMPLOYEE - PETTY THEFT                           W                          8    0.258065            31  3      W        
+## 444      DISHONEST EMPLOYEE - PETTY THEFT                           X                          8    0.258065            31  3      X        
+## 870      CHILD ABANDONMENT                                          H                         13    0.520000            25  3      H        
+## 921      HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE                  B                         13    0.541667            24  3      B        
+## 471      TILL TAP - PETTY ($950 &amp; UNDER)                            H                          7    0.304348            23  3      H        
+## 347      GRAND THEFT / INSURANCE FRAUD                              W                         10    0.526316            19  4      W        
+## 652      DOCUMENT WORTHLESS ($200 &amp; UNDER)                          W                          4    0.266667            15  4      W        
+## 944      CONSPIRACY                                                 H                          7    0.500000            14  4      H        
+## 522      VEHICLE - MOTORIZED SCOOTERS, BICYCLES, AND WHEELCHAIRS    W                          6    0.500000            12  4      W        
+## 865      DRUGS, TO A MINOR                                          H                          8    0.666667            12  4      H        
+## 451      PURSE SNATCHING - ATTEMPT                                  H                          6    0.545455            11  4      H        
+## 880      DISRUPT SCHOOL                                             B                          3    0.272727            11  4      B        
+## 880      DISRUPT SCHOOL                                             W                          3    0.272727            11  4      W        
+## 880      DISRUPT SCHOOL                                             X                          3    0.272727            11  4      X        
+## 435      LYNCHING                                                   H                          4    0.400000            10  4      H        
+## 473      THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)               H                          3    0.300000            10  4      H        
+## 473      THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)               W                          3    0.300000            10  4      W        
+## 353      DRUNK ROLL                                                 H                          4    0.444444             9  4      H        
+## 485      BIKE - ATTEMPTED STOLEN                                    H                          4    0.444444             9  4      H        
+## 924      TELEPHONE PROPERTY - DAMAGE                                H                          5    0.625000             8  4      H        
+## 931      REPLICA FIREARMS(SALE,DISPLAY,MANUFACTURE OR DISTRIBUTE)   H                          3    0.428571             7  4      H        
+## 942      BRIBERY                                                    H                          3    0.428571             7  4      H        
+## 942      BRIBERY                                                    W                          3    0.428571             7  4      W        
+## 436      LYNCHING - ATTEMPTED                                       H                          2    0.333333             6  4      H        
+## 446      PETTY THEFT - AUTO REPAIR                                  H                          2    0.400000             5  4      H        
+## 446      PETTY THEFT - AUTO REPAIR                                  W                          2    0.400000             5  4      W        
+## 475      THEFT, COIN MACHINE - ATTEMPT                              H                          2    0.400000             5  4      H        
+## 475      THEFT, COIN MACHINE - ATTEMPT                              X                          2    0.400000             5  4      X        
+## 840      BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM   O                          2    0.400000             5  4      O        
+## 840      BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM   W                          2    0.400000             5  4      W        
+## 452      PICKPOCKET, ATTEMPT                                        H                          2    0.500000             4  4      H        
+## 452      PICKPOCKET, ATTEMPT                                        W                          2    0.500000             4  4      W        
+## 349      GRAND THEFT / AUTO REPAIR                                  H                          2    0.666667             3  4      H        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    B                          1    0.333333             3  4      B        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    H                          1    0.333333             3  4      H        
+## 470      TILL TAP - GRAND THEFT ($950.01 &amp; OVER)                    X                          1    0.333333             3  4      X        
+## 884      FAILURE TO DISPERSE                                        W                          2    0.666667             3  4      W        
+## 830      INCEST (SEXUAL ACTS BETWEEN BLOOD RELATIVES)               H                          2    1.000000             2  4      H        
+## 948      BIGAMY                                                     H                          1    0.500000             2  4      H        
+## 948      BIGAMY                                                     W                          1    0.500000             2  4      W        
+## 952      ABORTION/ILLEGAL                                           H                          2    1.000000             2  4      H</code></pre>
+<p><img src="/post/2020-08-31-la-crime-what-s-it-like-pt-1.en-us_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+</div>
+</div>
 
               
             </div>
@@ -284,7 +868,7 @@ HUGOMORE42
 
   <a class="tag tag--primary tag--small" href="/tags/visualization/">visualization</a>
 
-  <a class="tag tag--primary tag--small" href="/tags/feature-engineering/">feature-engineering</a>
+  <a class="tag tag--primary tag--small" href="/tags/ggplot/">ggplot</a>
 
                   </div>
                 
