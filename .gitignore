@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+#ignore the dataset folder
+datasets/
+
+#ignore public folder
+public/
