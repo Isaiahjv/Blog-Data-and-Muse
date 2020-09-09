@@ -18,9 +18,7 @@ thumbnailImagePosition: left
 
 <!--more-->
 
-Thumbnail credit comes from: 
-
-https://www.latimes.com/california/story/2019-12-31/crime-in-los-angeles-drops-2019-police-community-partnerships-and-gang-intervention
+Thumbnail credit: https://www.latimes.com/california/story/2019-12-31/crime-in-los-angeles-drops-2019-police-community-partnerships-and-gang-intervention
 
 ```{r,echo=F,message=FALSE}
 library(RSocrata)
@@ -317,7 +315,8 @@ knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',bycount = F)%>%select(-ethn
 
 #### Population Rates
 
-I think this is perhaps the most astonishing finding here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not hispanic or latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
+I think this is perhaps the most astonishing figure here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not hispanic or latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
+
 
 ```{r,echo = F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data (see table below for crime descriptions). The X axis is the crime victim rate per 10,000 in the ethnic descent population (disparity). That is, each rate was calculated from the ethnic descent population count. The color symbolizes the ethnicity that was dominant in the disparity (see appendix for codes)",message = FALSE}
 
