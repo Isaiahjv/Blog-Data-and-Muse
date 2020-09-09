@@ -18,63 +18,80 @@ thumbnailImagePosition: left
 
 <!--more-->
 
-```{r,message=FALSE}
+Thumbnail credit comes from: 
+
+https://www.latimes.com/california/story/2019-12-31/crime-in-los-angeles-drops-2019-police-community-partnerships-and-gang-intervention
+
+```{r,echo=F,message=FALSE}
 library(RSocrata)
 ```
 
-```{r}
+```{r,echo = F}
+# ---------- How the data was originally retrieved ------------- 
+
 # df <- read.socrata(
 #   "https://data.lacity.org/resource/63jg-8b9z.json",
-#   app_token = "SnCniTABd1CGB0PdZwiadOCof"
+#   app_token = " TOKEN-OMITTED"
 # )
 ```
 
-```{r,message=FALSE}
+```{r,echo=F,message=FALSE}
 # set.seed(123)
 library(tidyverse)
+library(knitr)
+library(forcats)
+library(kableExtra)
 #dff <- df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.25) %>% ungroup() 
 #    mutate(vict_age = as.numeric(vict_age))
 # 
-# write.csv(df2,"~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv",row.names = F)
+#write.csv(df2,"~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv",row.names = F)
 
 df2 <- read.csv("~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv")
 ```
 
 
-```{r}
-#df2 %>% ggplot(mapping = aes(vict_age)) + 
-#   geom_histogram(bins = 50)
-# 
-# df2 %>% mutate(time_occ = as.numeric(time_occ)) %>% ggplot(mapping = aes(time_occ)) + 
-#   geom_histogram(bins = 75)
-# 
-# df2 %>% ggplot(mapping = aes(vict_age,colour = vict_descent )) + 
-#    geom_freqpoly(size = 0.75)
+
+## Introduction
+
+This post takes an exploratory look at the victims of crimes in the city of Los Angeles between 2010 and 2019. This is a good modern window of time of crime. I doubt all types of crime are represented here, but I am unsure if they are. I've seen many studies and debates on crime perpetrators, but not much on the associated victims. How victims distribute across demographics like age, sex, and ethnic descent, can be observed by graphs and some simple statistics. However, all of these graphs do not describe why crimes distribute the way they do, but rather the descriptive claim that the data suggests this distribution of crime victims across demographics. It suggests this distribution because there may be _measurement error_ in the data, perhaps some victims are less likely to report, so the distribution is not the "true" distribution.  Moreover, it is fallacious to conclude that the some of these factor cause outcomes in each other, but they can be associated, and may be influenced by a _confounding variable_.
+
+## Data
+
+The data comes from https://data.lacity.org/A-Safe-City/Crime-Data-from-2010-to-2019/63jg-8b9z. Data.lacity is an awesome source for open LA data that is well maintained. The dataset I use here is a  representative sample based on the crime, victim sex, and victim ethnic descent. That is, the number of crimes, sexes, and ethnic descents reflects the population counts proportionally. I use a 25% sample here for quicker computations, though I acknowledge the limitations of the factors I chose to sample with. One obvious criticism is location; location is not used in the sample and effects crime. 
+
+## Working definitions
+
+*Ethnicity*. I use the word "ethnicity" incorrectly here, as Black and White are under. The full data uses ethnic descent so i shortened it to ethnicity for practicality in the code. I'll get around to finding something more suitable.
 
 
-```
+*Disparity*. I use this term to either denominate a mathematical difference in proportions between two groups such as sex, or to denominate a group that has the highest representation for a crime. However, in the latter case, it may very well be that the difference between groups is small, while still having a max, which is the "disparity" seen in the graphs.
+
+## Disclaimer
+
+While I enjoy analyzing data, my subject domain is in statistics, thus any commentary is from a data and statistical perspective. I do not claim to be an expert in the substantive subject, so I encourage any viewers to comment and critique any methods or assumptions and offer corrections.
+
 
 ```{r, functions,echo=F,message=F}
-library(knitr)
-library(forcats)
+
   
-sex_disparity <- function(df2,bycount = F){
+sex_disparity <- function(df2,bycount = T){
   #pass below in for top 20 crimes
   #df2 %>% filter(crm_cd  %in% top20
   
-  total <- df2 %>% filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>% group_by(crm_cd,vict_sex) %>% summarize(n = n()) %>% mutate(total = sum(n)) %>% select(total) %>% 
+  total <- df2 %>%
+    mutate(vict_sex = case_when(vict_sex != 'F' & vict_sex != 'M' ~ NA_character_, TRUE ~ as.character(vict_sex))) %>%
+    group_by(crm_cd,vict_sex) %>% summarize(n = n()) %>% mutate(total = sum(n)) %>% select(total) %>% 
     distinct() %>% ungroup() %>% pull()
   
   
-  df2 <- df2 %>% 
-    filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>%
-    mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
+  df2 <- df2 %>%
+    mutate(vict_sex = case_when(vict_sex != 'F' & vict_sex != 'M' ~ NA_character_, TRUE ~ as.character(vict_sex)),vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
     group_by(crm_cd,crm_cd_desc,vict_sex) %>% summarize(count = n()) %>%  
     mutate(percent = round(count/sum(count),6)) %>%
-    pivot_wider(names_from = vict_sex, values_from = percent) %>% 
-    transmute(f = F, m = M,UNK) %>% tidyr::fill(m,.direction = "updown") %>% 
+    pivot_wider(names_from = vict_sex, values_from = percent) %>% select(-count) %>%
+    rename(f = F, m = M) %>% tidyr::fill(m,.direction = "updown") %>% 
     tidyr::fill(f,.direction = "updown") %>% tidyr::fill(UNK,.direction = "updown") %>%
-    replace_na(list(f = 0, m = 0)) %>%
+    replace_na(list(f = 0, m = 0,UNK = 0)) %>%
     distinct() %>% ungroup() %>% mutate(disparity = m-f,total_count = total)
   
   if(bycount == F){
@@ -107,41 +124,48 @@ helper_disp_df <- function(temp,bycount = T){
 }
 
 
-ethnic_disparity <- function(df2,bycount = FALSE, majority = TRUE,w = FALSE){
+ethnic_disparity <- function(df2,bycount = TRUE, majority = TRUE,w = FALSE){
   
-  total <- df2 %>% filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>% group_by(crm_cd,vict_descent) %>% summarize(n = n()) %>% mutate(total = sum(n)) %>% select(total) %>% 
-    distinct() %>% ungroup() %>% pull()
-  
+  # Note each disparity is divided by .25 to get a population level from the 25% sample of the population dataset
   if(w == T){
-    total
     demo_rep <- c(.285, .089, .116, .485)
-    demo_rep <- 1/(3979576*demo_rep)
+    demo_rep <- 3979576*demo_rep
     names(demo_rep) <- c('W',"B", "A","H")
-    df2 <- df2 %>% filter(vict_descent %in% names(demo_rep) ) %>% 
+    df2 <- df2 %>% filter(vict_descent %in% names(demo_rep)) %>% 
       group_by(crm_cd,crm_cd_desc,vict_descent) %>% 
       summarize(ethnic_count = n()) %>% 
-      mutate(disparity = case_when(vict_descent == 'W' ~ demo_rep['W'] * ethnic_count, vict_descent == 'B' ~ demo_rep['B']*ethnic_count, vict_descent == 'A' ~ demo_rep['A']*ethnic_count,TRUE ~ demo_rep['H']*ethnic_count)) %>% 
+      mutate(disparity = case_when(vict_descent == 'W' ~ 10000*ethnic_count/(.25*demo_rep['W']), 
+                                   vict_descent == 'B' ~ 10000*ethnic_count/(.25*demo_rep['B']), 
+                                   vict_descent == 'A' ~ 10000*ethnic_count/(.25*demo_rep['A']),
+                                   TRUE ~ 10000*ethnic_count/(.25*demo_rep['H'])),
+             population = case_when(vict_descent == 'W' ~ demo_rep['W'], vict_descent == 'B' ~ demo_rep['B'],
+                                    vict_descent == 'A' ~ demo_rep['A'],TRUE ~ demo_rep['H'] )) %>% 
     mutate(total_count = sum(ethnic_count))
   } else {
-    df2 <- df2 %>% group_by(crm_cd,crm_cd_desc,vict_descent) %>% summarize(ethnic_count = n()) %>%  
+    
+    f_levels <- df2 %>% pull(vict_descent) %>% levels()
+    df2 <- df2 %>% mutate(vict_descent = case_when(  !(vict_descent %in% f_levels) ~ 'UNK', TRUE ~ as.character(vict_descent)),vict_descent = as.factor(vict_descent)) %>% group_by(crm_cd,crm_cd_desc,vict_descent) %>% summarize(ethnic_count = n()) %>%  
     mutate(disparity = round(ethnic_count/sum(ethnic_count),6)) %>% 
     mutate(total_count = sum(ethnic_count))
   }
   
   
+  helper <- function(df2,bycount = F){
+    if(bycount == F){
+      df2 %>% arrange(desc(abs(disparity)))
+    }else{
+      df2 %>% arrange(desc(total_count))  
+    }
+  }
   
   if(majority == T){
     df2 <- df2 %>% filter(disparity == max(disparity)) 
   } else{
-    return(df2)
+    return(helper(df2,bycount = bycount))
   }
   
-  if(bycount == F){
-    df2 %>% arrange(desc(abs(disparity)))
+  helper(df2,bycount = bycount)
   
-  }else{
-    df2 %>% arrange(desc(total_count))  
-  }
   
 }
 
@@ -149,8 +173,6 @@ vict_graph <- function(temp,grouping, bycount = T){
   
   if (bycount == T){
    
-    print(kable(temp))
-      
     temp %>% ggplot(mapping = aes(x = crm_cd, y = disparity, group = grouping)) + 
     geom_col(aes(fill = grouping)) +
     theme(axis.text = element_text(size = 5)) +
@@ -159,13 +181,12 @@ vict_graph <- function(temp,grouping, bycount = T){
     facet_wrap(vars(rank), scales = 'free') #'free_y'
       
   } else {
-    print(kable(temp))
-   
+
     temp %>% ggplot(mapping = aes(x = crm_cd, y = disparity, group = grouping)) + 
     geom_col(aes(fill = grouping)) +
     theme(axis.text = element_text(size = 5)) +
     coord_flip() +
-    ggtitle(str_c("Crime victim distribution by ", grouping, "ordered by highest disparity level")) +
+    ggtitle(str_c("Crime victim distribution by ", grouping, " ordered by highest disparity level")) +
     facet_wrap(vars(rank), scales = 'free')
   }
  
@@ -173,22 +194,22 @@ vict_graph <- function(temp,grouping, bycount = T){
   
 }
 
-prep_dfs <- function(df,grouping = 'sex', bycount = T,p_prop = T){
+prep_dfs <- function(df,grouping = 'sex', bycount = T,p_prop = F,majority = T){
   if (grouping == "sex"){
     temp <- df %>% sex_disparity(bycount = bycount) %>% 
      mutate(vict_disp_dom = ifelse(disparity > 0,"male_vict_dom","fem_vict_dom"), 
             disparity = abs(disparity), crm_cd = as.factor(crm_cd)) #%>% head(n = top)
    
-     temp <- temp %>% helper_disp_df(bycount) %>% mutate(grouping = vict_disp_dom)
+     temp <- temp %>% helper_disp_df(bycount) %>% rename(grouping = vict_disp_dom)
      
   
   }  else if (grouping == "ethnicity"){
         if (p_prop == T){
-            temp <- df %>% ethnic_disparity(bycount = bycount,w=T) %>% helper_disp_df(bycount) %>% 
-              ungroup() %>% mutate(grouping = vict_descent)
+            temp <- df %>% ethnic_disparity(bycount = bycount,w=T,majority = majority) %>% helper_disp_df(bycount) %>% 
+              ungroup() %>% rename(grouping = vict_descent)
         }else{
-          temp <- df %>% ethnic_disparity(bycount) %>% helper_disp_df(bycount) %>% 
-              ungroup() %>% mutate(grouping = vict_descent)
+          temp <- df %>% ethnic_disparity(bycount,majority = majority) %>% helper_disp_df(bycount) %>% 
+              ungroup() %>% rename(grouping = vict_descent)
         }
     
     
@@ -209,29 +230,11 @@ victim_plot <- function(df,grouping = 'sex',bycount = T,p_prop = FALSE){
 }
 
 
-checking <- function(df){
-  
-  df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.7) %>% ungroup() %>% 
-  mutate(vict_age = as.numeric(vict_age)) %>% victim_plot()
-}
-#df %>% checking()
-
-testt <- function(df,v){
-  df %>% group_by(force(v)) %>% summarize(n = n())
-}
-
-#testt(df2, "vict_descent")
 ```
 
 
-
-```{r}
-
-```
-
-
-```{r}
-samp <- ggtitle("does it work?")
+```{r, echo = F,message=F,warning=F}
+samp <- ggtitle("Sex distribution of Crime Victims")
 df2 %>% group_by(vict_sex) %>% summarize(n = n() ) %>%
   mutate(value = round(n/sum(n),6)) %>%
   ggplot(aes(x=vict_sex, y = value, group=vict_sex)) +
@@ -241,79 +244,110 @@ df2 %>% group_by(vict_sex) %>% summarize(n = n() ) %>%
 ```
 
 
-variable interests: weapon_used_cd, sex, vict_sex
-```{r}
+
+```{r,echo = F}
 #total crime
-df2 %>% filter(crm_cd == '121') %>% mutate(vict_age = as.numeric(vict_age)) %>% ggplot(aes(x = vict_age)) + geom_histogram()
+barfill <- "#4271AE"
+barlines <- "#1F3552"
+
+df2 %>%  mutate(vict_age = as.numeric(vict_age)) %>% filter(vict_age != 0) %>% ggplot(aes(x = vict_age)) + geom_histogram(binwidth = 2,colour = barlines, fill = barfill)
 ```
 
-```{r}
-#110	CRIMINAL HOMICIDE
-df2 %>% ethnic_disparity(bycount = T,majority = T, w = T) #%>% 
-  #filter(crm_cd == '110') %>% mutate(percent = disparity)
-
-df2  %>% filter(vict_sex == 'F') %>% ethnic_disparity(bycount = T,majority = 'F') %>% filter(crm_cd == '110') %>% mutate(percent = disparity)
-
-#white,black,asian,hispanic
 
 
+## Distribution of Crime Victims by Demographics {.tabset}
 
-```
+For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of either count of crimes or disparities in crimes. Each figure has a corresponding dataset, and a description directly below the graph. I keep the commentary to minimum on the graphs and corresponding datasets, as they speak for themselves in terms of the crimes and the astonishing disparities between groups. One thing to note is that I did not have time to look at difference across ethnic descents while keeping sex constant (e.g. only males).
 
-## Distribution of crimes by demographics {.tabset}
+###  Sex
 
-For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of some variable, such as most common crimes. So the 1st plot will show the top x amount of crimes (most common), and the 4th plot will show the bottom x crimes (least common). 
-
-###  sex
-
+I made the assumption to label any NA or "unknown" sex as "UNK". 
 
 #### Between sexes ordered by most commmon crimes
-```{r, fig.fullwidith = T,fig.cap = "In boxes boxes 1-4 are in order of highest disparities"}
-#df2 %>% victim_plot(grouping = "ethnicity",p_prop = T)
 
-#df2 %>% victim_plot(grouping = "sex")
+```{r,echo=F,fig.cap = "Boxes 1-4 are in order of  most common crimes to least, box 1 being highest. The Y axis are the codes for the crimes (see table below for crime descriptions). The X axis is the disparity between male and female crime victim proportions. The color symbolizes the sex that was dominant in the disparity.",message=F}
 
 
-df2 %>% 
-    filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T) %>%
-    mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
-    group_by(crm_cd,crm_cd_desc,vict_sex) %>% summarize(count = n()) %>%  
-    mutate(percent = round(count/sum(count),6)) %>%
-    pivot_wider(names_from = vict_sex, values_from = percent) %>% 
-    transmute(f = F, m = M,UNK) %>% tidyr::fill(m,.direction = "updown") %>% 
-    tidyr::fill(f,.direction = "updown") %>% tidyr::fill(UNK,.direction = "updown") %>%
-    replace_na(list(f = 0, m = 0))
+df2 %>% victim_plot(grouping = "sex")
+
+knitr::kable(df2 %>% prep_dfs(grouping = 'sex') %>% select(-grouping,-rank),'html',col.names = c("crime code", "crime description", "female proportion", "male proportion", "unknown","disparity","crime count")) %>%
+  kable_paper("hover", full_width = T) %>% 
+  scroll_box(width = "100%", height = "500px") 
 
 ```
+
+
 
 #### Between sexes ordered by highest disparities of crimes
 
-```{r}
+```{r,echo=F,fig.cap= "Boxes 1-4 are in order of highest disparities to lowest, box 1 being highest. The Y axis are the codes for the crimes (see table below for crime descriptions). The X axis is the disparity between male and female crime victim proportions. The color symbolizes the sex that was dominant in the disparity.", message = F}
+
 df2 %>% victim_plot(grouping = "sex", bycount = F)
+knitr::kable(df2 %>% prep_dfs(grouping = 'sex',bycount = F),'html',col.names = c("crime code", "crime description", "female proportion", "male proportion", "unknown","disparity","total crime count","dominance","rank")) %>%
+  kable_paper("hover", full_width = T) %>% 
+  scroll_box(width = "100%", height = "500px") 
+
+
+
 ```
 
-### Ethnic Descent
+### Between Ethnic Descent
 
-#### Between Ethnic Descents Ordered by Most Commmon Crimes
-```{r}
+#### Common Crimes
+```{r,echo=F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data see table below for crime descriptions). The Y axis are the codes for the crimes (see table below for crime description). The X axis is the highest proportion of crime victims belonging to an ethnic descent. The color symbolizes the ethnicity that was dominant in the crime representation (see appendix for ethnicity codes).",message=F}
 df2 %>% victim_plot(grouping = "ethnicity")
+knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity')%>%select(-ethnic_count,),'html',col.names = c("crime code", "crime description", "ethnicity", "proportion", "total crime count","rank")) %>%
+  kable_paper("hover", full_width = T) %>% 
+  scroll_box(width = "100%", height = "500px") 
+
+
+
 ```
 
-#### Between Ethnic Descents Ordered by Highest Reprentation for Crimes
+#### Highest Disparities
 
-```{r}
-df2 %>% victim_plot(grouping = "ethnicity")
+```{r,echo=F, fig.cap="Boxes 1-4 are in order of highest disparities to lowest, box 1 being highest. The Y axis are the codes for the crimes (see table below for crime descriptions). The X axis is the highest proportion of crime victims belonging to an ethnic descent (disparity). The color symbolizes the ethnicity that was dominant in the disparity (see appendix for codes)",message = FALSE}
+df2 %>% victim_plot(grouping = "ethnicity", bycount = F)
+knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',bycount = F)%>%select(-ethnic_count,),'html',col.names = c("crime code", "crime description", "ethnicity", "proportion", "total crime count","rank")) %>%
+  kable_paper("hover", full_width = T) %>% 
+  scroll_box(width = "100%", height = "500px") 
+
 ```
 
+
+#### Population Rates
+
+I think this is perhaps the most astonishing finding here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not hispanic or latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
+
+```{r,echo = F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data (see table below for crime descriptions). The X axis is the crime victim rate per 10,000 in the ethnic descent population (disparity). That is, each rate was calculated from the ethnic descent population count. The color symbolizes the ethnicity that was dominant in the disparity (see appendix for codes)",message = FALSE}
+
+# reminder: the function that calculated the rate divides by .25 to get population count because the data is a 25% sample. Thus, it will need to be changed, should the sample percent change.
+df2 %>% victim_plot(grouping = "ethnicity",p_prop = T)
+knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',p_prop = T, majority = F) %>% select(-total_count),'html',col.names = c("crime code", "crime description", "ethnicity","ethnic count","rate per 10k", "ethnic population","rank")) %>%
+  kable_paper("hover", full_width = T) %>% 
+  scroll_box(width = "100%", height = "500px") 
+
+```
 
 
 
 
 ```{r, echo=F,message=F}
-# ------------------------------- Code Junkyard: # ------------------------------- 
+# ------------------------------- Code Graveyard: # ------------------------------- 
 
 # from sex disparity: 
 
+# df2 %>% 
+#     filter(vict_sex == "M" | vict_sex =="F" | is.na(vict_sex) == T | vict_sex == 'X') %>%
+#     mutate(vict_sex = forcats::fct_explicit_na(vict_sex,na_level = "UNK")) %>%
+#     group_by(crm_cd,crm_cd_desc,vict_sex) %>% summarize(count = n()) %>%  
+#     mutate(percent = round(count/sum(count),6)) %>%
+#     pivot_wider(names_from = vict_sex, values_from = percent) %>% select(-count) %>%
+#     rename(f = F, m = M) %>% tidyr::fill(m,.direction = "updown") %>% 
+#     tidyr::fill(f,.direction = "updown") %>% tidyr::fill(UNK,.direction = "updown") %>%
+#     tidyr::fill(X,.direction = "updown") %>%
+#     replace_na(list(f = 0, m = 0)) %>%
+#     distinct() %>% ungroup() 
 
 # df2 %>% group_by(vict_descent) %>% summarize(count = n()) %>% arrange(desc(count))
 # 
