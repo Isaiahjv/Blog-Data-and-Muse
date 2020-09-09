@@ -64,6 +64,7 @@ The data comes from https://data.lacity.org/A-Safe-City/Crime-Data-from-2010-to-
 
 *Disparity*. I use this term to either denominate a mathematical difference in proportions between two groups such as sex, or to denominate a group that has the highest representation for a crime. However, in the latter case, it may very well be that the difference between groups is small, while still having a max, which is the "disparity" seen in the graphs.
 
+
 ## Disclaimer
 
 While I enjoy analyzing data, my subject domain is in statistics, thus any commentary is from a data and statistical perspective. I do not claim to be an expert in the substantive subject, so I encourage any viewers to comment and critique any methods or assumptions and offer corrections.
@@ -230,6 +231,7 @@ victim_plot <- function(df,grouping = 'sex',bycount = T,p_prop = FALSE){
 
 ```
 
+I beleive the codings H are mistakes, as they were not in the data.lacity codings. X denotes "unknown".
 
 ```{r, echo = F,message=F,warning=F}
 samp <- ggtitle("Sex distribution of Crime Victims")
@@ -259,7 +261,8 @@ For all demographics, there are 4 plots that belong to 1 figure. The plots are i
 
 ###  Sex
 
-I made the assumption to label any NA or "unknown" sex as "UNK". 
+Sex codes: F - Female M - Male X - Unknown.
+I made the assumption to label any NA or "Unknown" sex as "UNK". As can be see
 
 #### Between sexes ordered by most commmon crimes
 
@@ -290,6 +293,8 @@ knitr::kable(df2 %>% prep_dfs(grouping = 'sex',bycount = F),'html',col.names = c
 ```
 
 ### Between Ethnic Descent
+
+Descent Code: A - Other Asian B - Black C - Chinese D - Cambodian F - Filipino G - Guamanian H - Hispanic/Latin/Mexican I - American Indian/Alaskan Native J - Japanese K - Korean L - Laotian O - Other P - Pacific Islander S - Samoan U - Hawaiian V - Vietnamese W - White X - Unknown Z - Asian Indian
 
 #### Common Crimes
 ```{r,echo=F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data see table below for crime descriptions). The Y axis are the codes for the crimes (see table below for crime description). The X axis is the highest proportion of crime victims belonging to an ethnic descent. The color symbolizes the ethnicity that was dominant in the crime representation (see appendix for ethnicity codes).",message=F}
