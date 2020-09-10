@@ -18,6 +18,8 @@ thumbnailImagePosition: left
 
 <!--more-->
 
+_Disclaimer_. While I enjoy analyzing data, my subject specialty is in statistics, thus any commentary is from a data and statistical perspective. I do not claim to be an expert in the substantive topics analyzed; any information should not be substituted for an expert. This blog is for practice and intrigue, and while I aim to be accurate, errors may be present. All comments or views belong to the original author. I encourage any viewers to comment and critique any methods or assumptions and offer corrections.
+
 Thumbnail credit: https://www.latimes.com/california/story/2019-12-31/crime-in-los-angeles-drops-2019-police-community-partnerships-and-gang-intervention
 
 ```{r,echo=F,message=FALSE}
@@ -51,23 +53,19 @@ df2 <- read.csv("~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv")
 
 ## Introduction
 
-This post takes an exploratory look at the victims of crimes in the city of Los Angeles between 2010 and 2019. This is a good modern window of time of crime. I doubt all types of crime are represented here, but I am unsure if they are. I've seen many studies and debates on crime perpetrators, but not much on the associated victims. How victims distribute across demographics like age, sex, and ethnic descent, can be observed by graphs and some simple statistics. However, all of these graphs do not describe why crimes distribute the way they do, but rather the descriptive claim that the data suggests this distribution of crime victims across demographics. It suggests this distribution because there may be _measurement error_ in the data, perhaps some victims are less likely to report, so the distribution is not the "true" distribution.  Moreover, it is fallacious to conclude that the some of these factor cause outcomes in each other, but they can be associated, and may be influenced by a _confounding variable_.
+This post takes an exploratory look at the victims of crimes in the city of Los Angeles between 2010 and 2019. This is a good modern window of time of crime. I doubt all types of crime are represented here, but I am unsure if they are. I've seen many studies and debates on crime perpetrators, but not much on the associated victims. How victims distribute across demographics like age, sex, and ethnic descent, can be observed by graphs and some simple statistics. However, all of these graphs do not describe _why_ crimes distribute the way they do, but rather the describe how the data distributes. The data suggests this distribution because there may be _measurement error_ in the data, perhaps some victims are less likely to report, so the distribution is not the "true" distribution.  Moreover, it is fallacious to conclude that some of these factor cause outcomes in each other, but they can be associated and may be influenced by a _confounding variable_.
 
 ## Data
 
-The data comes from https://data.lacity.org/A-Safe-City/Crime-Data-from-2010-to-2019/63jg-8b9z. Data.lacity is an awesome source for open LA data that is well maintained. The dataset I use here is a  representative sample based on the crime, victim sex, and victim ethnic descent. That is, the number of crimes, sexes, and ethnic descents reflects the population counts proportionally. I use a 25% sample here for quicker computations, though I acknowledge the limitations of the factors I chose to sample with. One obvious criticism is location; location is not used in the sample and effects crime. 
+The data comes from https://data.lacity.org/A-Safe-City/Crime-Data-from-2010-to-2019/63jg-8b9z. Data.lacity is an awesome source for open LA data that is well maintained. The dataset I use here is a  representative sample based on the crime, victim sex, and victim ethnic descent. That is, the number of crimes, sexes, and ethnic descents reflect the population counts proportionally. I use a 25% sample here for quicker computations, though I acknowledge the limitations of the factors I chose to sample with. One obvious criticism is location; location is not used in the sample and effects crime. 
 
 ## Working definitions
 
-*Ethnicity*. I use the word "ethnicity" incorrectly here, as Black and White are under. The full data uses ethnic descent so i shortened it to ethnicity for practicality in the code. I'll get around to finding something more suitable.
+*Ethnicity*. I use the word "ethnicity" incorrectly here, as Black and White are included. The full data uses ethnic descent so I shortened it to ethnicity for practicality in the code. I'll get around to finding something more suitable.
 
 
 *Disparity*. I use this term to either denominate a mathematical difference in proportions between two groups such as sex, or to denominate a group that has the highest representation for a crime. However, in the latter case, it may very well be that the difference between groups is small, while still having a max, which is the "disparity" seen in the graphs.
 
-
-## Disclosure
-
-While I enjoy analyzing data, my subject domain is in statistics, thus any commentary is from a data and statistical perspective. I do not claim to be an expert in the substantive subject, so I encourage any viewers to comment and critique any methods or assumptions and offer corrections.
 
 
 
@@ -234,6 +232,8 @@ victim_plot <- function(df,grouping = 'sex',bycount = T,p_prop = FALSE){
 
 ## Distribution of Crime Victims by Demographics {.tabset}
 
+For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of either count of crimes or disparities in crimes. Each figure has a corresponding dataset, and a description directly below the graph. I keep the commentary to minimum on the graphs and corresponding datasets, as they speak for themselves in terms of the crimes and the astonishing disparities between groups. One thing to note is that I did not have time to look at difference across ethnic descents while keeping sex constant (e.g. only males).
+
 I beleive the codings H are mistakes, as they were not in the data.lacity codings. X denotes "unknown".
 
 ```{r, echo = F,message=F,warning=F}
@@ -256,13 +256,10 @@ barlines <- "#1F3552"
 df2 %>%  mutate(vict_age = as.numeric(vict_age)) %>% filter(vict_age != 0) %>% ggplot(aes(x = vict_age)) + geom_histogram(binwidth = 2,colour = barlines, fill = barfill)
 ```
 
-
-For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of either count of crimes or disparities in crimes. Each figure has a corresponding dataset, and a description directly below the graph. I keep the commentary to minimum on the graphs and corresponding datasets, as they speak for themselves in terms of the crimes and the astonishing disparities between groups. One thing to note is that I did not have time to look at difference across ethnic descents while keeping sex constant (e.g. only males).
-
 ###  Sex
 
 Sex codes: F - Female M - Male X - Unknown.
-I made the assumption to label any NA or "Unknown" sex as "UNK". As can be see
+I made the assumption to label any NA or "Unknown" sex as "UNK", As can be seen later.
 
 #### Between sexes ordered by most commmon crimes
 
@@ -320,7 +317,7 @@ knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',bycount = F)%>%select(-ethn
 
 #### Population Rates
 
-I think this is perhaps the most astonishing figure here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not hispanic or latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
+I think this is perhaps the most astonishing figure here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not Hispanic or Latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
 
 
 ```{r,echo = F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data (see table below for crime descriptions). The X axis is the crime victim rate per 10,000 in the ethnic descent population (disparity). That is, each rate was calculated from the ethnic descent population count. The color symbolizes the ethnicity that was dominant in the disparity (see appendix for codes)",message = FALSE}
