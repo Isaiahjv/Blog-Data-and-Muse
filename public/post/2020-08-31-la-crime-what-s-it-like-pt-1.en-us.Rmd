@@ -29,7 +29,7 @@ library(RSocrata)
 
 # df <- read.socrata(
 #   "https://data.lacity.org/resource/63jg-8b9z.json",
-#   app_token = " TOKEN-OMITTED"
+#   app_token = "omit"
 # )
 ```
 
@@ -42,9 +42,12 @@ library(kableExtra)
 #dff <- df %>% group_by(crm_cd,vict_sex,vict_descent) %>% sample_frac(.25) %>% ungroup() 
 #    mutate(vict_age = as.numeric(vict_age))
 # 
-#write.csv(df2,"~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv",row.names = F)
+#write.csv(df2,"~/Desktop/Isaiah's Blog/blog/datasets/lacrime.csv",row.names = F)
 
-df2 <- read.csv("~/Desktop/Isaiah's Blog/blog/opening/datasets/lacrime.csv")
+lacrime <- read.csv(file = "~/Desktop/Isaiah's Blog/blog/datasets/lacrime.csv")
+
+df2 <- lacrime
+
 ```
 
 
@@ -130,10 +133,10 @@ ethnic_disparity <- function(df2,bycount = TRUE, majority = TRUE,w = FALSE){
     df2 <- df2 %>% filter(vict_descent %in% names(demo_rep)) %>% 
       group_by(crm_cd,crm_cd_desc,vict_descent) %>% 
       summarize(ethnic_count = n()) %>% 
-      mutate(disparity = case_when(vict_descent == 'W' ~ 10000*ethnic_count/(.25*demo_rep['W']), 
-                                   vict_descent == 'B' ~ 10000*ethnic_count/(.25*demo_rep['B']), 
-                                   vict_descent == 'A' ~ 10000*ethnic_count/(.25*demo_rep['A']),
-                                   TRUE ~ 10000*ethnic_count/(.25*demo_rep['H'])),
+      mutate(disparity = case_when(vict_descent == 'W' ~ 10000*ethnic_count/(demo_rep['W']), 
+                                   vict_descent == 'B' ~ 10000*ethnic_count/(demo_rep['B']), 
+                                   vict_descent == 'A' ~ 10000*ethnic_count/(demo_rep['A']),
+                                   TRUE ~ 10000*ethnic_count/(demo_rep['H'])),
              population = case_when(vict_descent == 'W' ~ demo_rep['W'], vict_descent == 'B' ~ demo_rep['B'],
                                     vict_descent == 'A' ~ demo_rep['A'],TRUE ~ demo_rep['H'] )) %>% 
     mutate(total_count = sum(ethnic_count))
@@ -315,14 +318,23 @@ knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',bycount = F)%>%select(-ethn
 
 #### Population Rates
 
-I think this is perhaps the most astonishing figure here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not Hispanic or Latino), Black, Asian, and Hispanic or Latino. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be notes that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
+I think this is perhaps the most astonishing figure here. It is well known that frequencies are usually correlated with population size. In the previous section, hispanic victims are proportionally very high, but as can be seen here, including populations of ethnic descents in LA tells a different story. Each ethnic descent population is derived from the census in LA at https://www.census.gov/quickfacts/losangelescitycalifornia. Being that the census does not show all ethnic descents given here, I restricted the data to White (not Hispanic or Latino), Black, Asian, and Hispanic or Latino. For all other data I used a sample, but here I used the full dataset with a little over 2 million rows. I used the full dataset here because when I divide the result by .25 to get the values in full dataset, they were sometimes off a couple counts, for reasons I'm not sure yet. Within ethnic descents, rates of crime victims per 10,000 sometimes show extreme disparities compared to other ethnic groups. It should be noted that higher rate does not mean more likely to occur in the population of all people, but rather relative to ethnic population.
 
 
 ```{r,echo = F,fig.cap="Boxes 1-4 are in descending order of most common crimes to least, box 1 being highest crime counts in data (see table below for crime descriptions). The X axis is the crime victim rate per 10,000 in the ethnic descent population (disparity). That is, each rate was calculated from the ethnic descent population count. The color symbolizes the ethnicity that was dominant in the disparity (see appendix for codes)",message = FALSE}
 
-# reminder: the function that calculated the rate divides by .25 to get population count because the data is a 25% sample. Thus, it will need to be changed, should the sample percent change.
-df2 %>% victim_plot(grouping = "ethnicity",p_prop = T)
-knitr::kable(df2 %>% prep_dfs(grouping = 'ethnicity',p_prop = T, majority = F) %>% select(-total_count),'html',col.names = c("crime code", "crime description", "ethnicity","ethnic count","rate per 10k", "ethnic population","rank")) %>%
+# reminder: the function that calculated the rate does not divide by .25, the sample percentage, to get population count. Thus, it will need to be changed, should the sample be used.
+
+library(OpenImageR)
+
+img<-OpenImageR::readImage("~/Desktop/Isaiah's Blog/blog/figures/LA-crime/crime_vict_prop2pop.png")
+imageShow(img)
+
+#ggplot2::ggsave(df %>% victim_plot(grouping = "ethnicity",p_prop = T))
+# write.csv(df %>% prep_dfs(grouping = 'ethnicity',p_prop = T, majority = F)%>%select(-total_count),"~/Desktop/Isaiah's Blog/blog/datasets/vict2pop.csv",row.names = F)
+
+
+knitr::kable(read.csv("~/Desktop/Isaiah's Blog/blog/datasets/vict2pop.csv"),'html',col.names = c("crime code", "crime description", "ethnicity","ethnic count","rate per 10k", "ethnic population","rank")) %>%
   kable_paper("hover", full_width = T) %>% 
   scroll_box(width = "100%", height = "500px") 
 
