@@ -232,6 +232,8 @@ victim_plot <- function(df,grouping = 'sex',bycount = T,p_prop = FALSE){
 
 ```
 
+## Distribution of Crime Victims by Demographics {.tabset}
+
 I beleive the codings H are mistakes, as they were not in the data.lacity codings. X denotes "unknown".
 
 ```{r, echo = F,message=F,warning=F}
@@ -254,9 +256,6 @@ barlines <- "#1F3552"
 df2 %>%  mutate(vict_age = as.numeric(vict_age)) %>% filter(vict_age != 0) %>% ggplot(aes(x = vict_age)) + geom_histogram(binwidth = 2,colour = barlines, fill = barfill)
 ```
 
-
-
-## Distribution of Crime Victims by Demographics {.tabset}
 
 For all demographics, there are 4 plots that belong to 1 figure. The plots are in descending order of either count of crimes or disparities in crimes. Each figure has a corresponding dataset, and a description directly below the graph. I keep the commentary to minimum on the graphs and corresponding datasets, as they speak for themselves in terms of the crimes and the astonishing disparities between groups. One thing to note is that I did not have time to look at difference across ethnic descents while keeping sex constant (e.g. only males).
 
