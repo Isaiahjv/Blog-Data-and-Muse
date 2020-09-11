@@ -44,9 +44,7 @@ library(kableExtra)
 # 
 #write.csv(df2,"~/Desktop/Isaiah's Blog/blog/datasets/lacrime.csv",row.names = F)
 
-lacrime <- read.csv(file = "~/Desktop/Isaiah's Blog/blog/datasets/lacrime.csv")
-
-df2 <- lacrime
+df2 <- read.csv(file = "~/Desktop/Isaiah's Blog/blog/Blog-Data-and-Muse/datasets/lacrime.csv")
 
 ```
 
@@ -327,14 +325,14 @@ I think this is perhaps the most astonishing figure here. It is well known that 
 
 library(OpenImageR)
 
-img<-OpenImageR::readImage("~/Desktop/Isaiah's Blog/blog/figures/LA-crime/crime_vict_prop2pop.png")
+img<-OpenImageR::readImage("~/Desktop/Isaiah's Blog/Blog-Data-and-Muse/figures/LA-crime/crime_vict_prop2pop.png")
 imageShow(img)
 
 #ggplot2::ggsave(df %>% victim_plot(grouping = "ethnicity",p_prop = T))
 # write.csv(df %>% prep_dfs(grouping = 'ethnicity',p_prop = T, majority = F)%>%select(-total_count),"~/Desktop/Isaiah's Blog/blog/datasets/vict2pop.csv",row.names = F)
 
 
-knitr::kable(read.csv("~/Desktop/Isaiah's Blog/blog/datasets/vict2pop.csv"),'html',col.names = c("crime code", "crime description", "ethnicity","ethnic count","rate per 10k", "ethnic population","rank")) %>%
+knitr::kable(read.csv("~/Desktop/Isaiah's Blog/blog/Blog-Data-and-Muse/datasets/vict2pop.csv"),'html',col.names = c("crime code", "crime description", "ethnicity","ethnic count","rate per 10k", "ethnic population","rank")) %>%
   kable_paper("hover", full_width = T) %>% 
   scroll_box(width = "100%", height = "500px") 
 
